@@ -24,6 +24,9 @@ class XmR:
         self.mr = result
         return self.mr
 
+    def x_average(self) -> Decimal:
+        return self.mean(self.counts)
+
     def mr_average(self) -> Decimal:
         assert self.moving_ranges()[0] is None
         valid_values = cast(TYPE_COUNTS, self.moving_ranges()[1:])
@@ -34,14 +37,15 @@ class XmR:
         return round(limit, 3)
 
     def upper_natural_process_limit(self) -> Decimal:
-        limit = self.mean(self.counts) + (Decimal('2.660') * self.mr_average())
+        limit = self.x_average() + (Decimal('2.660') * self.mr_average())
         return round(limit, 3)
 
     def lower_natural_process_limit(self) -> Decimal:
         """
-        LNPL can be negative.  It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
+        LNPL can be negative.
+        It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
-        limit = self.mean(self.counts) - (Decimal('2.660') * self.mr_average())
+        limit = self.x_average() - (Decimal('2.660') * self.mr_average())
         return round(limit, 3)
 
     @staticmethod

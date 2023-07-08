@@ -20,10 +20,16 @@ counts = [10, 50, 40, 30]
 
 xmr = XmR(counts)
 moving_ranges = xmr.moving_ranges()
+unpl = xmr.upper_natural_process_limit()
+lnpl = xmr.lower_natural_process_limit()
+x_bar = xmr.x_average()
+
+url = xmr.upper_range_limit()
+mr_bar = xmr.mr_average()
 
 ```
 
-Currently this library only supports the data for generating an XmR chart.
+Currently, this library only supports the data for generating an XmR chart.
 An XmR chart is the simplest type of process behaviour chart.
 XmR is short for individual values (X) and a moving range (mR).
 More chart data options can be added via pull requests.
