@@ -2,7 +2,7 @@ import unittest
 
 from decimal import Decimal
 
-from statprocon.xmr import XmR
+from statprocon import XmR
 
 
 class XmRTestCase(unittest.TestCase):
