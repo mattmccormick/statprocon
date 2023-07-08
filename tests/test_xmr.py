@@ -42,9 +42,63 @@ class XmRTestCase(unittest.TestCase):
         limit = xmr.lower_natural_process_limit()
         self.assertEqual(limit, Decimal('-91.863'))
 
+    def test_points_beyond_upper_limits(self):
+        """
+        This test dataset comes from Table 9.1: Accident Rates in Making Sense of Data
+        """
+
+        group_a = [43, 40, 37, 33, 30, 33, 34, 35, 29, 33, 31, 39]
+        group_b_upper = Decimal('39.3')
+        group_b_lower = Decimal('18.0')
+
+        xmr = XmR(group_a)
+
+        expected = {0, 1}
+        self.assertSetEqual(xmr.x_indices_beyond_limits(group_b_upper, group_b_lower), expected)
+
+    def test_points_beyond_lower_limits(self):
+        """
+        This test dataset comes from Table 9.1: Accident Rates in Making Sense of Data
+        """
+        group_b = [35, 37, 33, 32, 27, 29, 31, 22, 25, 30, 24, 19]
+        group_a_upper = Decimal('43.9')
+        group_a_lower = Decimal('25.6')
+
+        xmr = XmR(group_b)
+
+        expected = {7, 8, 10, 11}
+        self.assertSetEqual(xmr.x_indices_beyond_limits(group_a_upper, group_a_lower), expected)
+
+    def test_points_beyond_both_limits(self):
+        """
+        This test dataset comes from Table 9.2: Accounts Receivable for Years One and Two in Making Sense of Data
+        """
+
+        ar_pct_sales = ['55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2', '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9']
+        counts_dec = list(map(lambda x: Decimal(x), ar_pct_sales))
+        xmr = XmR(counts_dec)
+
+        upper_limit = Decimal('60.7')
+        # Index 13 is exactly equal to upper_limit
+        # In Figure 9.5, this point is identified as meeting the criteria
+        expected = {11, 12, 13, 19, 22}
+        self.assertSetEqual(xmr.x_indices_beyond_limits(upper_limit=upper_limit), expected)
+
+    def test_point_beyond_upper_range_limit(self):
+        """
+        This test dataset also comes from Table 9.2
+        """
+        ar_pct_sales = ['55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2',
+                        '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9']
+        counts_dec = list(map(lambda x: Decimal(x), ar_pct_sales))
+        xmr = XmR(counts_dec)
+
+        expected = {19}
+        self.assertSetEqual(xmr.mr_indices_beyond_limits(), expected)
+
     def test_verifying_software(self):
         """
-        This test and dataset comes from pg 382 of Making Sense of Data:
+        This test dataset comes from pg 382 of Making Sense of Data:
             Data Set to Use When Verifying Software
         """
 
