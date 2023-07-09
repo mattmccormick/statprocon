@@ -2,6 +2,10 @@
 
 ---
 
+## 0.0.4
+
+- Support type hints
+
 ## 0.0.3
 
 - Support type hints
