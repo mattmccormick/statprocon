@@ -4,4 +4,4 @@
 
 ## 0.0.1
 
-- Initial Setup
+- Added XmR chart based on the average moving range

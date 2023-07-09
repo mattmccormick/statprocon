@@ -1,9 +1,7 @@
 # statprocon
 
----
-
 **statprocon** is a Python helper library for generating data for use in **Stat**istical **Pro**cess **Con**trol charts.
-SPC charts are aleso known as Process Behaviour Charts, Control charts or Shewhart charts.
+SPC charts are also known as Process Behaviour Charts, Control charts or Shewhart charts.
 
 ## Installation
 
@@ -34,7 +32,7 @@ An XmR chart is the simplest type of process behaviour chart.
 XmR is short for individual values (X) and a moving range (mR).
 More chart data options can be added via pull requests.
 
-For more information, I invite you to read "Making Sense of Data" by Donald Wheeler.
+For more information, I invite you to read [Making Sense of Data by Donald Wheeler](https://www.amazon.com/Making-Sense-Data-Donald-Wheeler/dp/0945320728).
 
 ## Dependencies
 

@@ -16,7 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-keywords = ["Statistical Process Control", "SPC", "Quality Control Chart", "QCC", "Process Behaviour Chart", "Process Behavior Chart", "XmR", "Shewhart"]
+keywords = ["Statistical Process Control", "SPC", "Quality Control Chart", "QCC", "Process Behaviour Chart", "Process Behavior Chart", "XmR", "Shewhart", "Wheeler"]
 
 [project.urls]
 "Homepage" = "https://github.com/mattmccormick/statprocon"

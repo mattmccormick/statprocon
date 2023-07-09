@@ -182,7 +182,3 @@ class XmRTestCase(unittest.TestCase):
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 1))
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit(), 1))
         self.assertEqual(url, round(xmr.upper_range_limit(), 1))
-
-
-if __name__ == '__main__':
-    unittest.main()
