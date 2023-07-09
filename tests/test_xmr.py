@@ -53,8 +53,10 @@ class XmRTestCase(unittest.TestCase):
 
         xmr = XmR(group_a)
 
-        expected = {0, 1}
-        self.assertSetEqual(xmr.rule_1_x_indices_beyond_limits(group_b_upper, group_b_lower), expected)
+        expected = [False] * len(group_a)
+        for i in [0, 1]:
+            expected[i] = True
+        self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(group_b_upper, group_b_lower), expected)
 
     def test_rule_1_points_beyond_lower_limits(self):
         """
@@ -66,8 +68,10 @@ class XmRTestCase(unittest.TestCase):
 
         xmr = XmR(group_b)
 
-        expected = {7, 8, 10, 11}
-        self.assertSetEqual(xmr.rule_1_x_indices_beyond_limits(group_a_upper, group_a_lower), expected)
+        expected = [False] * len(group_b)
+        for i in [7, 8, 10, 11]:
+            expected[i] = True
+        self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(group_a_upper, group_a_lower), expected)
 
     def test_rule_1_points_beyond_both_limits(self):
         """
@@ -81,8 +85,10 @@ class XmRTestCase(unittest.TestCase):
         upper_limit = Decimal('60.7')
         # Index 13 is exactly equal to upper_limit
         # In Figure 9.5, this point is identified as meeting the criteria
-        expected = {11, 12, 13, 19, 22}
-        self.assertSetEqual(xmr.rule_1_x_indices_beyond_limits(upper_limit=upper_limit), expected)
+        expected = [False] * len(ar_pct_sales)
+        for i in [11, 12, 13, 19, 22]:
+            expected[i] = True
+        self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(upper_limit=upper_limit), expected)
 
     def test_rule_1_point_beyond_upper_range_limit(self):
         """
@@ -93,8 +99,23 @@ class XmRTestCase(unittest.TestCase):
         counts_dec = list(map(lambda x: Decimal(x), ar_pct_sales))
         xmr = XmR(counts_dec)
 
-        expected = {19}
-        self.assertSetEqual(xmr.rule_1_mr_indices_beyond_limits(), expected)
+        expected = [False] * len(ar_pct_sales)
+        expected[19] = True
+        self.assertListEqual(xmr.rule_1_mr_indices_beyond_limits(), expected)
+
+    def test_rule_2(self):
+        """
+        This test dataset comes from Table 8.1: Percentage of High School Seniors Who Smooke Daily in Making Sense of Data
+        """
+        percentages = [21.3, 20.2, 20.9, 21.0, 18.8, 19.6, 18.7, 18.6, 18.1, 18.9, 19.2, 18.2, 17.3, 19.0]
+
+        xmr = XmR(percentages)
+
+        expected = [
+            False, False, False, False, False, False,
+            True, True, True, True, True, True, True, True
+        ]
+        self.assertListEqual(xmr.rule_2_runs_about_central_line(), expected)
 
     def test_verifying_software(self):
         """
