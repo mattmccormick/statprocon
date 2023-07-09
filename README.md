@@ -63,6 +63,12 @@ source venv/bin/activate
 python -m build
 ```
 
+[Upload](https://packaging.python.org/en/latest/tutorials/packaging-projects/#uploading-the-distribution-archives)
+
+```shell
+python -m twine upload dist/*
+```
+
 ### Testing
 
 [Install package from source](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#installing-from-source)
