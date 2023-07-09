@@ -11,6 +11,10 @@ class XmR:
         self._mr: TYPE_MOVING_RANGES = []
 
     def moving_ranges(self) -> TYPE_MOVING_RANGES:
+        """
+        Moving ranges are the absolute differences between successive count values.
+        The first element will always be None
+        """
         if self._mr:
             return self._mr
 
@@ -124,6 +128,42 @@ class XmR:
                     result[i - j] = True
             elif abs(central_line) > 8:
                 result[i] = True
+
+        return result
+
+    def rule_3_runs_near_limits(self) -> list[bool]:
+        """
+        Runs Near the Limits
+
+        Three out of four successive values on the X Chart
+        all within the upper 25% of the region between the limits, or
+        all within the lower 25% of the region between the limits,
+        may be interpreted as an indication of the presence
+        of an assignable cause which has a *moderate* but sustained effect.
+        """
+        result = [False] * len(self.counts)
+
+        unpl = self.upper_natural_process_limit()
+        lnpl = self.lower_natural_process_limit()
+        upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
+        lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl
+
+        # positive value is point near upper limit
+        # negative value is point near lower limit
+        near_limits = [0] * len(self.counts)
+
+        for i, x in enumerate(self.counts):
+            if x < lower_25:
+                near_limits[i] = -1
+
+            if x > upper_25:
+                near_limits[i] = 1
+
+            if i >= 3:
+                successive_values = near_limits[i - 3:i + 1]
+                if abs(sum(successive_values)) >= 3:
+                    for j in range(i - 3, i + 1):
+                        result[j] = True
 
         return result
 

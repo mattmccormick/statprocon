@@ -117,6 +117,24 @@ class XmRTestCase(unittest.TestCase):
         ]
         self.assertListEqual(xmr.rule_2_runs_about_central_line(), expected)
 
+    def test_rule_3(self):
+        """
+        Data comes from pg 130 of "Making Sense of Data"
+        Figure 9.9 XmR Chart for AM Premedication Peak Flow Rates for Days 1 to 18
+        @see test_peak_flow_rates
+        """
+
+        x_values = [120, 140, 100, 150, 260, 150, 100, 120, 300, 300, 275, 300, 140, 1750, 150, 150, 190, 180]
+        unpl = Decimal('322.5')
+        lnpl = Decimal('43.7')
+
+        xmr = XmR(x_values)
+
+        expected = [False] * len(x_values)
+        for i in range(8, 4):
+            expected[i] = True
+        self.assertListEqual(xmr.rule_3_runs_near_limits(), expected)
+
     def test_verifying_software(self):
         """
         This test dataset comes from pg 382 of Making Sense of Data:
