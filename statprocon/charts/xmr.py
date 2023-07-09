@@ -48,7 +48,7 @@ class XmR:
         limit = self.x_average() - (Decimal('2.660') * self.mr_average())
         return round(limit, 3)
 
-    def x_indices_beyond_limits(
+    def rule_1_x_indices_beyond_limits(
             self,
             upper_limit: Optional[Decimal] = None,
             lower_limit: Optional[Decimal] = None
@@ -69,7 +69,7 @@ class XmR:
 
         return self._points_beyond_limits(self.counts, upper, lower)
 
-    def mr_indices_beyond_limits(self) -> set[int]:
+    def rule_1_mr_indices_beyond_limits(self) -> set[int]:
         """
         Points Outside the Limits
 

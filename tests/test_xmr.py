@@ -42,7 +42,7 @@ class XmRTestCase(unittest.TestCase):
         limit = xmr.lower_natural_process_limit()
         self.assertEqual(limit, Decimal('-91.863'))
 
-    def test_points_beyond_upper_limits(self):
+    def test_rule_1_points_beyond_upper_limits(self):
         """
         This test dataset comes from Table 9.1: Accident Rates in Making Sense of Data
         """
@@ -54,9 +54,9 @@ class XmRTestCase(unittest.TestCase):
         xmr = XmR(group_a)
 
         expected = {0, 1}
-        self.assertSetEqual(xmr.x_indices_beyond_limits(group_b_upper, group_b_lower), expected)
+        self.assertSetEqual(xmr.rule_1_x_indices_beyond_limits(group_b_upper, group_b_lower), expected)
 
-    def test_points_beyond_lower_limits(self):
+    def test_rule_1_points_beyond_lower_limits(self):
         """
         This test dataset comes from Table 9.1: Accident Rates in Making Sense of Data
         """
@@ -67,9 +67,9 @@ class XmRTestCase(unittest.TestCase):
         xmr = XmR(group_b)
 
         expected = {7, 8, 10, 11}
-        self.assertSetEqual(xmr.x_indices_beyond_limits(group_a_upper, group_a_lower), expected)
+        self.assertSetEqual(xmr.rule_1_x_indices_beyond_limits(group_a_upper, group_a_lower), expected)
 
-    def test_points_beyond_both_limits(self):
+    def test_rule_1_points_beyond_both_limits(self):
         """
         This test dataset comes from Table 9.2: Accounts Receivable for Years One and Two in Making Sense of Data
         """
@@ -82,9 +82,9 @@ class XmRTestCase(unittest.TestCase):
         # Index 13 is exactly equal to upper_limit
         # In Figure 9.5, this point is identified as meeting the criteria
         expected = {11, 12, 13, 19, 22}
-        self.assertSetEqual(xmr.x_indices_beyond_limits(upper_limit=upper_limit), expected)
+        self.assertSetEqual(xmr.rule_1_x_indices_beyond_limits(upper_limit=upper_limit), expected)
 
-    def test_point_beyond_upper_range_limit(self):
+    def test_rule_1_point_beyond_upper_range_limit(self):
         """
         This test dataset also comes from Table 9.2
         """
@@ -94,7 +94,7 @@ class XmRTestCase(unittest.TestCase):
         xmr = XmR(counts_dec)
 
         expected = {19}
-        self.assertSetEqual(xmr.mr_indices_beyond_limits(), expected)
+        self.assertSetEqual(xmr.rule_1_mr_indices_beyond_limits(), expected)
 
     def test_verifying_software(self):
         """
