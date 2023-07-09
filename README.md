@@ -57,6 +57,12 @@ Activate virtualenv
 source venv/bin/activate
 ```
 
+[Build](https://packaging.python.org/en/latest/tutorials/packaging-projects/#generating-distribution-archiveshttps://packaging.python.org/en/latest/tutorials/packaging-projects/#generating-distribution-archives)
+
+```shell
+python -m build
+```
+
 ### Testing
 
 [Install package from source](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#installing-from-source)
