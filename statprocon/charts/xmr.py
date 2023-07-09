@@ -6,9 +6,26 @@ TYPE_MOVING_RANGES = list[Decimal | int | None]
 
 
 class XmR:
-    def __init__(self, counts: TYPE_COUNTS):
+    def __init__(
+            self,
+            counts: TYPE_COUNTS,
+            subset_start_index: int = 0,
+            subset_end_index: Optional[int] = None,
+    ):
+        """
+
+        :param counts: TYPE_COUNTS list of data to be used by the X chart
+        :param subset_start_index: Optional starting index of counts to calculate limits from
+        :param subset_end_index: Optional ending index of counts to calculate limits to
+        """
         self.counts = counts
         self._mr: TYPE_MOVING_RANGES = []
+        self.i = max(0, subset_start_index)
+        self.j = len(counts)
+        if subset_end_index:
+            self.j = min(self.j, subset_end_index)
+
+        assert self.i <= self.j
 
     def moving_ranges(self) -> TYPE_MOVING_RANGES:
         """
@@ -29,11 +46,11 @@ class XmR:
         return self._mr
 
     def x_average(self) -> Decimal:
-        return self.mean(self.counts)
+        return self.mean(self.counts[self.i:self.j])
 
     def mr_average(self) -> Decimal:
         assert self.moving_ranges()[0] is None
-        valid_values = cast(TYPE_COUNTS, self.moving_ranges()[1:])
+        valid_values = cast(TYPE_COUNTS, self.moving_ranges()[self.i+1:self.j])
         return self.mean(valid_values)
 
     def upper_range_limit(self) -> Decimal:
