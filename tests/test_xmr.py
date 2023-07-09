@@ -42,6 +42,21 @@ class XmRTestCase(unittest.TestCase):
         limit = xmr.lower_natural_process_limit()
         self.assertEqual(limit, Decimal('-91.863'))
 
+    def test_limits_with_subsets(self):
+        counts = [1] * 25
+        counts[1] = 10
+        counts[2] = 100
+        counts[3] = 50
+
+        xmr = XmR(counts, subset_end_index=24)
+        self.assertEqual(xmr.upper_natural_process_limit(), Decimal('30.441'))
+        self.assertEqual(xmr.upper_range_limit(), Decimal('28.133'))
+
+        # Adjust manually so that all subset values should be 1
+        xmr.i = 4
+        self.assertEqual(xmr.x_average(), 1)
+        self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
+
     def test_rule_1_points_beyond_upper_limits(self):
         """
         This test dataset comes from Table 9.1: Accident Rates in Making Sense of Data
