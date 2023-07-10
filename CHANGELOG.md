@@ -2,11 +2,11 @@
 
 ---
 
+## 0.0.5
+
+- Fix bug with point equal to limits being detected
+
 ## 0.0.4
-
-- Support type hints
-
-## 0.0.3
 
 - Support type hints
 

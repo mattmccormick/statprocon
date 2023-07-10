@@ -93,17 +93,23 @@ class XmRTestCase(unittest.TestCase):
         This test dataset comes from Table 9.2: Accounts Receivable for Years One and Two in Making Sense of Data
         """
 
-        ar_pct_sales = ['55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2', '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9']
+        ar_pct_sales = [
+            '55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2',
+            '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9'
+        ]
         counts_dec = list(map(lambda x: Decimal(x), ar_pct_sales))
         xmr = XmR(counts_dec)
 
         upper_limit = Decimal('60.7')
-        # Index 13 is exactly equal to upper_limit
-        # In Figure 9.5, this point is identified as meeting the criteria
         expected = [False] * len(ar_pct_sales)
-        for i in [11, 12, 13, 19, 22]:
+        for i in [11, 12, 19, 22]:
             expected[i] = True
-        self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(upper_limit=upper_limit), expected)
+
+        actual = xmr.rule_1_x_indices_beyond_limits(upper_limit=upper_limit)
+        self.assertListEqual(actual, expected)
+
+        # Point 13 is detected in the chart in the book because the actual percentage is slightly lower than the limit
+        self.assertFalse(actual[13], 'Point 13 equals the limit and should not be detected')
 
     def test_rule_1_point_beyond_upper_range_limit(self):
         """

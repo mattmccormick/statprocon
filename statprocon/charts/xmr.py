@@ -195,7 +195,7 @@ class XmR:
             if val is None:
                 continue
 
-            if not lower_limit < val < upper_limit:
+            if not lower_limit <= val <= upper_limit:
                 result[i] = True
 
         return result
