@@ -2,6 +2,11 @@
 
 ---
 
+## 0.0.6
+
+- Round averages to 3 digits to match limits
+- Add `to_dict()` and implement `__repr()__`
+
 ## 0.0.5
 
 - Fix bug with point equal to limits being detected
