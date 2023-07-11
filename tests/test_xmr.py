@@ -12,6 +12,11 @@ class XmRTestCase(unittest.TestCase):
         mr = xmr.moving_ranges()
         self.assertEqual(mr, [])
 
+    def test_average_contains_one_more_exponent_as_input(self):
+        counts = [3, 3, 4]
+        xmr = XmR(counts)
+        self.assertEqual(xmr.x_average(), Decimal('3.333'))
+
     def test_moving_range_ints(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
@@ -28,19 +33,19 @@ class XmRTestCase(unittest.TestCase):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
         url = xmr.upper_range_limit()
-        self.assertEqual(url, Decimal('162.311'))
+        self.assertEqual(url, Decimal('162.312'))
 
     def test_upper_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
         limit = xmr.upper_natural_process_limit()
-        self.assertEqual(limit, Decimal('172.363'))
+        self.assertEqual(limit, Decimal('172.364'))
 
     def test_lower_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
         limit = xmr.lower_natural_process_limit()
-        self.assertEqual(limit, Decimal('-91.863'))
+        self.assertEqual(limit, Decimal('-91.864'))
 
     def test_limits_with_subsets(self):
         counts = [1] * 25
@@ -49,8 +54,8 @@ class XmRTestCase(unittest.TestCase):
         counts[3] = 50
 
         xmr = XmR(counts, subset_end_index=24)
-        self.assertEqual(xmr.upper_natural_process_limit(), Decimal('30.441'))
-        self.assertEqual(xmr.upper_range_limit(), Decimal('28.133'))
+        self.assertEqual(xmr.upper_natural_process_limit(), Decimal('30.442'))
+        self.assertEqual(xmr.upper_range_limit(), Decimal('28.134'))
 
         # Adjust manually so that all subset values should be 1
         xmr.i = 4
@@ -190,7 +195,7 @@ class XmRTestCase(unittest.TestCase):
         x_avg = Decimal('183.1')
         mr_avg = Decimal('52.4')
 
-        # changes are due to rounding and using constants with 2 sig digits
+        # changes are due to rounding
         unpl = Decimal('322.3')  # 322.5 in book
         lnpl = Decimal('43.8')  # 43.7 in book
         url = Decimal('171.1')  # 171.3 in book

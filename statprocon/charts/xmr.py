@@ -6,6 +6,8 @@ TYPE_MOVING_RANGES = list[Decimal | int | None]
 
 
 class XmR:
+    ROUNDING = 3
+
     def __init__(
             self,
             counts: TYPE_COUNTS,
@@ -46,20 +48,22 @@ class XmR:
         return self._mr
 
     def x_average(self) -> Decimal:
-        return self.mean(self.counts[self.i:self.j])
+        avg = self.mean(self.counts[self.i:self.j])
+        return self.round(avg)
 
     def mr_average(self) -> Decimal:
         assert self.moving_ranges()[0] is None
         valid_values = cast(TYPE_COUNTS, self.moving_ranges()[self.i+1:self.j])
-        return self.mean(valid_values)
+        avg = self.mean(valid_values)
+        return self.round(avg)
 
     def upper_range_limit(self) -> Decimal:
         limit = Decimal('3.268') * self.mr_average()
-        return round(limit, 3)
+        return self.round(limit)
 
     def upper_natural_process_limit(self) -> Decimal:
         limit = self.x_average() + (Decimal('2.660') * self.mr_average())
-        return round(limit, 3)
+        return self.round(limit)
 
     def lower_natural_process_limit(self) -> Decimal:
         """
@@ -67,7 +71,7 @@ class XmR:
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
         limit = self.x_average() - (Decimal('2.660') * self.mr_average())
-        return round(limit, 3)
+        return self.round(limit)
 
     def rule_1_x_indices_beyond_limits(
             self,
@@ -183,6 +187,9 @@ class XmR:
                         result[j] = True
 
         return result
+
+    def round(self, value: Decimal):
+        return round(value, self.ROUNDING)
 
     @staticmethod
     def _points_beyond_limits(
