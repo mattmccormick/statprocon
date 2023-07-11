@@ -12,6 +12,20 @@ class XmRTestCase(unittest.TestCase):
         mr = xmr.moving_ranges()
         self.assertEqual(mr, [])
 
+    def test_repr(self):
+        counts = [3, 4, 5]
+        xmr = XmR(counts)
+
+        expected = """Counts: [3, 4, 5]
+UNPL  : 6.660
+X bar : 4.000
+LNPL  : 1.340
+MR    : [None, 1, 1]
+URL   : 3.268
+MR bar: 1.000
+"""
+        self.assertEqual(xmr.__repr__(), expected)
+
     def test_average_contains_one_more_exponent_as_input(self):
         counts = [3, 3, 4]
         xmr = XmR(counts)

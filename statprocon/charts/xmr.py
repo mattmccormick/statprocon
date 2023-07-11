@@ -29,6 +29,24 @@ class XmR:
 
         assert self.i <= self.j
 
+    def __repr__(self):
+        result = ''
+        for k, v in self.to_dict().items():
+            k_format = '{0: <6}'.format(k)
+            result += f'{k_format}: {v}\n'
+        return result
+
+    def to_dict(self):
+        return {
+            'Counts': self.counts,
+            'UNPL': self.upper_natural_process_limit(),
+            'X bar': self.x_average(),
+            'LNPL': self.lower_natural_process_limit(),
+            'MR': self.moving_ranges(),
+            'URL': self.upper_range_limit(),
+            'MR bar': self.mr_average(),
+        }
+
     def moving_ranges(self) -> TYPE_MOVING_RANGES:
         """
         Moving ranges are the absolute differences between successive count values.
