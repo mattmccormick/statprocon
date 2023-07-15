@@ -26,6 +26,17 @@ MR bar: 1.000
 """
         self.assertEqual(xmr.__repr__(), expected)
 
+    def test_to_csv(self):
+        counts = [3, 4, 5]
+        xmr = XmR(counts)
+
+        expected = """Counts,UNPL,X Avg,LNPL,MR,URL,MR Avg\r
+3,6.660,4.000,1.340,,3.268,1.000\r
+4,6.660,4.000,1.340,1,3.268,1.000\r
+5,6.660,4.000,1.340,1,3.268,1.000\r
+"""
+        self.assertEqual(xmr.to_csv(), expected)
+
     def test_average_contains_one_more_exponent_as_input(self):
         counts = [3, 3, 4]
         xmr = XmR(counts)

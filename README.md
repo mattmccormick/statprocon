@@ -32,7 +32,38 @@ An XmR chart is the simplest type of process behaviour chart.
 XmR is short for individual values (X) and a moving range (mR).
 More chart data options can be added via pull requests.
 
-For more information, I invite you to read [Making Sense of Data by Donald Wheeler](https://www.amazon.com/Making-Sense-Data-Donald-Wheeler/dp/0945320728).
+For more information, please read [Making Sense of Data by Donald Wheeler](https://www.amazon.com/Making-Sense-Data-Donald-Wheeler/dp/0945320728).
+
+### CSV
+
+Quickly generate a CSV of all the data needed to create XmR charts.
+
+```python
+print(xmr.to_csv())
+```
+
+### Google Sheets Charts
+
+Quickly generate XmR Charts in Google Sheets
+
+1. Make a copy of the [statprocon XmR Template sheet](https://docs.google.com/spreadsheets/d/1IdCBpE8FK4qP8B7qHQeXX6amLZ8oyhc8OjlBlGHmWTg/edit?usp=sharing)
+1. Paste the CSV output from above into cell A1
+1. Click `Data -> Split Text to Columns`
+
+The X and MR charts will appear on the right.
+
+Note that the Lower Natural Process Limit may not make sense if your count data could not possibly go negative.
+If LNPL is not needed remove it by:
+
+1. Double click on the X Chart
+1. Click the `Setup` tab
+1. Under `Series`, find `LNPL`
+1. Click the 3 dot menu on the right next to `LNPL`
+1. Click `Remove`
+
+The LNPL line will be removed from the X Chart.
+
+
 
 ## Dependencies
 

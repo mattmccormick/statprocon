@@ -5,6 +5,7 @@
 ## 0.0.7
 
 - Accept `float` inputs
+- Add `to_csv()` method
 
 ## 0.0.6
 

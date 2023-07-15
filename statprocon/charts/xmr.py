@@ -1,3 +1,6 @@
+import csv
+import io
+
 from decimal import Decimal
 from typing import cast, Union, Optional
 
@@ -29,7 +32,7 @@ class XmR:
 
         assert self.i <= self.j
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         result = ''
         for k, v in self.to_dict().items():
             k_format = '{0: <6}'.format(k)
@@ -41,7 +44,7 @@ class XmR:
             result += f'{k_format}: {values}\n'
         return result
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             'Counts': self.counts,
             'UNPL': self.upper_natural_process_limit(),
@@ -51,6 +54,24 @@ class XmR:
             'URL': self.upper_range_limit(),
             'MR bar': self.mr_average(),
         }
+
+    def to_csv(self) -> str:
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        unpl = self.upper_natural_process_limit()
+        x_bar = self.x_average()
+        lnpl = self.lower_natural_process_limit()
+        moving_ranges = self.moving_ranges()
+        url = self.upper_range_limit()
+        mr_bar = self.mr_average()
+
+        writer.writerow(['Counts', 'UNPL', 'X Avg', 'LNPL', 'MR', 'URL', 'MR Avg'])
+        for i, x in enumerate(self.counts):
+            row = [x, unpl, x_bar, lnpl, moving_ranges[i], url, mr_bar]
+            writer.writerow(row)
+
+        return output.getvalue()
 
     def moving_ranges(self) -> TYPE_MOVING_RANGES:
         """
