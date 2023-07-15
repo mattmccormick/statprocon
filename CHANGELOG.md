@@ -2,6 +2,10 @@
 
 ---
 
+## 0.0.7
+
+- Accept `float` inputs
+
 ## 0.0.6
 
 - Round averages to 3 digits to match limits
