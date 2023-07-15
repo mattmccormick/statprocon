@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import cast, Union, Optional
 
-TYPE_COUNTS = list[Decimal | int]
+TYPE_COUNTS = list[Decimal | int | float]
 TYPE_MOVING_RANGES = list[Decimal | int | None]
 
 
@@ -20,7 +20,7 @@ class XmR:
         :param subset_start_index: Optional starting index of counts to calculate limits from
         :param subset_end_index: Optional ending index of counts to calculate limits to
         """
-        self.counts = counts
+        self.counts = [Decimal(str(x)) for x in counts]
         self._mr: TYPE_MOVING_RANGES = []
         self.i = max(0, subset_start_index)
         self.j = len(counts)
@@ -33,7 +33,12 @@ class XmR:
         result = ''
         for k, v in self.to_dict().items():
             k_format = '{0: <6}'.format(k)
-            result += f'{k_format}: {v}\n'
+            values = ''
+            if isinstance(v, list):
+                values = '[' + ', '.join(map(str, v)) + ']'
+            else:
+                values = v
+            result += f'{k_format}: {values}\n'
         return result
 
     def to_dict(self):

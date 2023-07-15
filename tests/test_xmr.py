@@ -43,8 +43,15 @@ MR bar: 1.000
         mr = xmr.moving_ranges()
         self.assertEqual(mr, [None, Decimal('9.74'), Decimal('5.99')])
 
+    def test_float_input(self):
+        counts = [5.4, 3.8, 8.75, 3.6, 3, 6, 7.4, 10, 5.8, 6.6, 3, 8.8]
+        xmr = XmR(counts)
+        mr = xmr.moving_ranges()
+        expected = [None, Decimal('1.6'), Decimal('4.95'), Decimal('5.15'), Decimal('0.6'), Decimal('3'), Decimal('1.4'), Decimal('2.6'), Decimal('4.2'), Decimal('0.8'), Decimal('3.6'), Decimal('5.8')]
+        self.assertListEqual(mr, expected)
+
     def test_upper_range_limit(self):
-        counts = [1, 10, 100, 50]
+        counts = [1,51, 100, 50]
         xmr = XmR(counts)
         url = xmr.upper_range_limit()
         self.assertEqual(url, Decimal('162.312'))
