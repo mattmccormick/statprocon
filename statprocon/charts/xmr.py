@@ -52,11 +52,11 @@ class XmR:
         return {
             'x_values': self.counts,
             'x_unpl': self.upper_natural_process_limit(),
-            'x_cl': self.x_average(),
+            'x_cl': self.x_central_line(),
             'x_lnpl': self.lower_natural_process_limit(),
             'mr_values': self.moving_ranges(),
             'mr_url': self.upper_range_limit(),
-            'mr_cl': self.mr_average(),
+            'mr_cl': self.mr_central_line(),
         }
 
     def to_csv(self) -> str:
@@ -64,11 +64,11 @@ class XmR:
         writer = csv.writer(output)
 
         unpl = self.upper_natural_process_limit()
-        x_bar = self.x_average()
+        x_bar = self.x_central_line()
         lnpl = self.lower_natural_process_limit()
         moving_ranges = self.moving_ranges()
         url = self.upper_range_limit()
-        mr_bar = self.mr_average()
+        mr_bar = self.mr_central_line()
 
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
         for i, x in enumerate(self.counts):
@@ -95,22 +95,22 @@ class XmR:
         self._mr = result
         return self._mr
 
-    def x_average(self) -> Decimal:
+    def x_central_line(self) -> Decimal:
         avg = self.mean(self.counts[self.i:self.j])
         return self.round(avg)
 
-    def mr_average(self) -> Decimal:
+    def mr_central_line(self) -> Decimal:
         assert self.moving_ranges()[0] is None
         valid_values = cast(TYPE_COUNTS, self.moving_ranges()[self.i+1:self.j])
         avg = self.mean(valid_values)
         return self.round(avg)
 
     def upper_range_limit(self) -> Decimal:
-        limit = Decimal('3.268') * self.mr_average()
+        limit = Decimal('3.268') * self.mr_central_line()
         return self.round(limit)
 
     def upper_natural_process_limit(self) -> Decimal:
-        limit = self.x_average() + (Decimal('2.660') * self.mr_average())
+        limit = self.x_central_line() + (Decimal('2.660') * self.mr_central_line())
         return self.round(limit)
 
     def lower_natural_process_limit(self) -> Decimal:
@@ -118,7 +118,7 @@ class XmR:
         LNPL can be negative.
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
-        limit = self.x_average() - (Decimal('2.660') * self.mr_average())
+        limit = self.x_central_line() - (Decimal('2.660') * self.mr_central_line())
         return self.round(limit)
 
     def rule_1_x_indices_beyond_limits(
