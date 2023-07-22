@@ -46,6 +46,8 @@ print(xmr.to_csv())
 
 Quickly generate XmR Charts in Google Sheets
 
+https://github.com/mattmccormick/statprocon/assets/436801/0de1a9f3-a8ad-4047-8c9d-0f890e0bf453
+
 1. Make a copy of the [statprocon XmR Template sheet](https://docs.google.com/spreadsheets/d/1IdCBpE8FK4qP8B7qHQeXX6amLZ8oyhc8OjlBlGHmWTg/edit?usp=sharing)
 1. Paste the CSV output from above into cell A1
 1. Click `Data -> Split Text to Columns`
