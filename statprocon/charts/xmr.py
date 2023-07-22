@@ -46,20 +46,40 @@ class XmR:
             result += f'{k_format}: {values}\n'
         return result
 
+    def x_to_dict(self) -> dict:
+        """
+        Return the values needed for the X chart as a dictionary
+        """
+        n = len(self.counts)
+        return {
+            'values': self.counts,
+            'unpl': [self.upper_natural_process_limit()] * n,
+            'cl': [self.x_central_line()] * n,
+            'lnpl': [self.lower_natural_process_limit()] * n,
+        }
+
+    def mr_to_dict(self) -> dict:
+        """
+        Return the values needed for the MR chart as a dictionary
+        """
+        mr = self.moving_ranges()
+        n = len(mr)
+        return {
+            'values': mr,
+            'url': [self.upper_range_limit()] * n,
+            'cl': [self.mr_central_line()] * n,
+        }
+
     def to_dict(self) -> dict:
         # Naming comes from pg. 163
         #   So Which Way Should You Compute Limits? from Making Sense of Data
+        result = {}
+        for k, v in self.x_to_dict().items():
+            result[f'x_{k}'] = v
+        for k, v in self.mr_to_dict().items():
+            result[f'mr_{k}'] = v
 
-        n = len(self.counts)
-        return {
-            'x_values': self.counts,
-            'x_unpl': [self.upper_natural_process_limit()] * n,
-            'x_cl': [self.x_central_line()] * n,
-            'x_lnpl': [self.lower_natural_process_limit()] * n,
-            'mr_values': self.moving_ranges(),
-            'mr_url': [self.upper_range_limit()] * n,
-            'mr_cl': [self.mr_central_line()] * n,
-        }
+        return result
 
     def to_csv(self) -> str:
         output = io.StringIO()

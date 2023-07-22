@@ -6,6 +6,7 @@
 
 - Standardize `to_dict` keys
 - All keys return same length for easy import to `pandas`
+- Add `x_to_dict()` and `mr_to_dict()` methods
 
 ## 0.0.7
 
