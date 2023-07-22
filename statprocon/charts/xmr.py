@@ -49,14 +49,16 @@ class XmR:
     def to_dict(self) -> dict:
         # Naming comes from pg. 163
         #   So Which Way Should You Compute Limits? from Making Sense of Data
+
+        n = len(self.counts)
         return {
             'x_values': self.counts,
-            'x_unpl': self.upper_natural_process_limit(),
-            'x_cl': self.x_central_line(),
-            'x_lnpl': self.lower_natural_process_limit(),
+            'x_unpl': [self.upper_natural_process_limit()] * n,
+            'x_cl': [self.x_central_line()] * n,
+            'x_lnpl': [self.lower_natural_process_limit()] * n,
             'mr_values': self.moving_ranges(),
-            'mr_url': self.upper_range_limit(),
-            'mr_cl': self.mr_central_line(),
+            'mr_url': [self.upper_range_limit()] * n,
+            'mr_cl': [self.mr_central_line()] * n,
         }
 
     def to_csv(self) -> str:

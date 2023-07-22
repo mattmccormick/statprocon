@@ -5,6 +5,7 @@
 ## 0.0.8
 
 - Standardize `to_dict` keys
+- All keys return same length for easy import to `pandas`
 
 ## 0.0.7
 
