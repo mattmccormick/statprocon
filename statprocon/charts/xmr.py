@@ -2,10 +2,13 @@ import csv
 import io
 
 from decimal import Decimal
-from typing import cast, Union, Optional
+from typing import cast, Union, Optional, Sequence
 
-TYPE_COUNTS = list[Decimal | int | float]
-TYPE_MOVING_RANGES = list[Decimal | int | None]
+TYPE_COUNT_VALUE = Decimal | int
+TYPE_MOVING_RANGE_VALUE = Decimal | int | None
+
+TYPE_COUNTS = Sequence[TYPE_COUNT_VALUE | float]
+TYPE_MOVING_RANGES = Sequence[TYPE_MOVING_RANGE_VALUE]
 
 
 class XmR:
@@ -35,8 +38,7 @@ class XmR:
     def __repr__(self) -> str:
         result = ''
         for k, v in self.to_dict().items():
-            k_format = '{0: <6}'.format(k)
-            values = ''
+            k_format = '{0: <9}'.format(k)
             if isinstance(v, list):
                 values = '[' + ', '.join(map(str, v)) + ']'
             else:
@@ -45,14 +47,16 @@ class XmR:
         return result
 
     def to_dict(self) -> dict:
+        # Naming comes from pg. 163
+        #   So Which Way Should You Compute Limits? from Making Sense of Data
         return {
-            'Counts': self.counts,
-            'UNPL': self.upper_natural_process_limit(),
-            'X bar': self.x_average(),
-            'LNPL': self.lower_natural_process_limit(),
-            'MR': self.moving_ranges(),
-            'URL': self.upper_range_limit(),
-            'MR bar': self.mr_average(),
+            'x_values': self.counts,
+            'x_unpl': self.upper_natural_process_limit(),
+            'x_cl': self.x_average(),
+            'x_lnpl': self.lower_natural_process_limit(),
+            'mr_values': self.moving_ranges(),
+            'mr_url': self.upper_range_limit(),
+            'mr_cl': self.mr_average(),
         }
 
     def to_csv(self) -> str:
@@ -66,7 +70,7 @@ class XmR:
         url = self.upper_range_limit()
         mr_bar = self.mr_average()
 
-        writer.writerow(['Counts', 'UNPL', 'X Avg', 'LNPL', 'MR', 'URL', 'MR Avg'])
+        writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
         for i, x in enumerate(self.counts):
             row = [x, unpl, x_bar, lnpl, moving_ranges[i], url, mr_bar]
             writer.writerow(row)
@@ -81,7 +85,7 @@ class XmR:
         if self._mr:
             return self._mr
 
-        result: TYPE_MOVING_RANGES = []
+        result: list[TYPE_MOVING_RANGE_VALUE] = []
         for i, c in enumerate(self.counts):
             if i == 0:
                 result.append(None)

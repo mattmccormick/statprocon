@@ -16,13 +16,13 @@ class XmRTestCase(unittest.TestCase):
         counts = [3, 4, 5]
         xmr = XmR(counts)
 
-        expected = """Counts: [3, 4, 5]
-UNPL  : 6.660
-X bar : 4.000
-LNPL  : 1.340
-MR    : [None, 1, 1]
-URL   : 3.268
-MR bar: 1.000
+        expected = """x_values : [3, 4, 5]
+x_unpl   : 6.660
+x_cl     : 4.000
+x_lnpl   : 1.340
+mr_values: [None, 1, 1]
+mr_url   : 3.268
+mr_cl    : 1.000
 """
         self.assertEqual(xmr.__repr__(), expected)
 
@@ -30,7 +30,7 @@ MR bar: 1.000
         counts = [3, 4, 5]
         xmr = XmR(counts)
 
-        expected = """Counts,UNPL,X Avg,LNPL,MR,URL,MR Avg\r
+        expected = """x_values,x_unpl,x_cl,x_lnpl,mr_values,mr_url,mr_cl\r
 3,6.660,4.000,1.340,,3.268,1.000\r
 4,6.660,4.000,1.340,1,3.268,1.000\r
 5,6.660,4.000,1.340,1,3.268,1.000\r

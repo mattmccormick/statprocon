@@ -2,6 +2,10 @@
 
 ---
 
+## 0.0.8
+
+- Standardize `to_dict` keys
+
 ## 0.0.7
 
 - Accept `float` inputs
