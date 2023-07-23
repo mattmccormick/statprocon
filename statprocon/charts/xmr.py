@@ -165,11 +165,15 @@ class XmR:
         :return: list[bool] A list of boolean values of length(counts)
             True at index i means that self.counts[i] is above the upper_limit or below the lower_limit
         """
+        n = len(self.counts)
+        upper = self.upper_natural_process_limit()
+        if upper_limit:
+            upper = [upper_limit] * n
 
-        upper = upper_limit or self.upper_natural_process_limit()[0]
-        lower = lower_limit or self.lower_natural_process_limit()[0]
+        lower = self.lower_natural_process_limit()
+        if lower_limit:
+            lower = [lower_limit] * n
 
-        # TODO: change arguments to take lists
         return self._points_beyond_limits(self.counts, upper, lower)
 
     def rule_1_mr_indices_beyond_limits(self) -> list[bool]:
@@ -184,7 +188,7 @@ class XmR:
         :return: list[bool] A list of boolean values of length(self.moving_ranges())
             True at index i means that self.moving_ranges()[i] is above the Upper Range Limit
         """
-        return self._points_beyond_limits(self.moving_ranges(), self.upper_range_limit()[0])
+        return self._points_beyond_limits(self.moving_ranges(), self.upper_range_limit())
 
     def rule_2_runs_about_central_line(self) -> list[bool]:
         """
@@ -260,21 +264,25 @@ class XmR:
 
         return result
 
-    def round(self, value: Decimal):
+    def round(self, value: Decimal) -> Decimal:
         return round(value, self.ROUNDING)
 
     @staticmethod
     def _points_beyond_limits(
             data: TYPE_COUNTS | TYPE_MOVING_RANGES,
-            upper_limit: Decimal,
-            lower_limit: Decimal = Decimal('0')
+            upper_limits: Sequence[Decimal],
+            lower_limits: Optional[Sequence[Decimal]] = None
     ) -> list[bool]:
         result = [False] * len(data)
-        for i, val in enumerate(data):
-            if val is None:
+
+        if lower_limits is None:
+            lower_limits = [Decimal('-Inf')] * len(upper_limits)
+
+        for i, (x, w, y) in enumerate(zip(data, lower_limits, upper_limits)):
+            if x is None:  # first index of Moving Ranges
                 continue
 
-            if not lower_limit <= val <= upper_limit:
+            if not w <= x <= y:
                 result[i] = True
 
         return result
