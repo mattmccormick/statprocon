@@ -2,13 +2,13 @@ import csv
 import io
 
 from decimal import Decimal
-from typing import cast, Union, Optional, Sequence
+from typing import cast, Union, Optional, Sequence, TypeAlias
 
-TYPE_COUNT_VALUE = Decimal | int
-TYPE_MOVING_RANGE_VALUE = Decimal | int | None
+TYPE_COUNT_VALUE: TypeAlias = Decimal | int
+TYPE_MOVING_RANGE_VALUE: TypeAlias = Decimal | int | None
 
-TYPE_COUNTS = Sequence[TYPE_COUNT_VALUE | float]
-TYPE_MOVING_RANGES = Sequence[TYPE_MOVING_RANGE_VALUE]
+TYPE_COUNTS: TypeAlias = Sequence[TYPE_COUNT_VALUE | float]
+TYPE_MOVING_RANGES: TypeAlias = Sequence[TYPE_MOVING_RANGE_VALUE]
 
 
 class XmR:

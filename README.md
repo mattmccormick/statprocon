@@ -34,9 +34,25 @@ More chart data options can be added via pull requests.
 
 For more information, please read [Making Sense of Data by Donald Wheeler](https://www.amazon.com/Making-Sense-Data-Donald-Wheeler/dp/0945320728).
 
+### pandas
+
+Visualize XmR charts using Jupyter Notebooks and [pandas](https://pandas.pydata.org/)
+
+```python
+import pandas as pd
+from statprocon import XmR
+
+xmr = XmR(counts)
+
+pd.DataFrame(xmr.x_to_dict()).astype(float).plot()
+pd.DataFrame(xmr.mr_to_dict()).astype(float).plot()
+```
+
+
+
 ### CSV
 
-Quickly generate a CSV of all the data needed to create XmR charts.
+Generate a CSV of all the data needed to create XmR charts.
 
 ```python
 print(xmr.to_csv())
@@ -44,7 +60,7 @@ print(xmr.to_csv())
 
 ### Google Sheets Charts
 
-Quickly generate XmR Charts in Google Sheets
+Generate XmR Charts in Google Sheets
 
 https://github.com/mattmccormick/statprocon/assets/436801/0de1a9f3-a8ad-4047-8c9d-0f890e0bf453
 
@@ -55,9 +71,9 @@ https://github.com/mattmccormick/statprocon/assets/436801/0de1a9f3-a8ad-4047-8c9
 The X and MR charts will appear on the right.
 
 Note that the Lower Natural Process Limit may not make sense if your count data could not possibly go negative.
-If LNPL is not needed remove it by:
+If LNPL is not needed, remove it with the following steps:
 
-1. Double click on the X Chart
+1. Double-click on the X Chart
 1. Click the `Setup` tab
 1. Under `Series`, find `LNPL`
 1. Click the 3 dot menu on the right next to `LNPL`
