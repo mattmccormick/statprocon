@@ -83,7 +83,7 @@ class XmR:
         writer = csv.writer(output)
 
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
-        for x, unpl, x_cl, lnpl, mr, url, mr_cl in zip(
+        writer.writerows(zip(
             self.counts,
             self.upper_natural_process_limit(),
             self.x_central_line(),
@@ -91,10 +91,7 @@ class XmR:
             self.moving_ranges(),
             self.upper_range_limit(),
             self.mr_central_line()
-        ):
-            row = [x, unpl, x_cl, lnpl, mr, url, mr_cl]
-            writer.writerow(row)
-
+        ))
         return output.getvalue()
 
     def moving_ranges(self) -> TYPE_MOVING_RANGES:
