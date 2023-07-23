@@ -53,7 +53,7 @@ class XmR:
         n = len(self.counts)
         return {
             'values': self.counts,
-            'unpl': [self.upper_natural_process_limit()] * n,
+            'unpl': self.upper_natural_process_limit(),
             'cl': self.x_central_line(),
             'lnpl': [self.lower_natural_process_limit()] * n,
         }
@@ -94,7 +94,7 @@ class XmR:
 
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
         for i, x in enumerate(self.counts):
-            row = [x, unpl, x_cl[i], lnpl, moving_ranges[i], url, mr_cl]
+            row = [x, unpl[i], x_cl[i], lnpl, moving_ranges[i], url, mr_cl]
             writer.writerow(row)
 
         return output.getvalue()
@@ -131,9 +131,9 @@ class XmR:
         limit = Decimal('3.268') * self.mr_central_line()
         return self.round(limit)
 
-    def upper_natural_process_limit(self) -> Decimal:
+    def upper_natural_process_limit(self) -> Sequence[Decimal]:
         limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line())
-        return self.round(limit)
+        return [self.round(limit)] * len(self.counts)
 
     def lower_natural_process_limit(self) -> Decimal:
         """
@@ -163,9 +163,10 @@ class XmR:
             True at index i means that self.counts[i] is above the upper_limit or below the lower_limit
         """
 
-        upper = upper_limit or self.upper_natural_process_limit()
+        upper = upper_limit or self.upper_natural_process_limit()[0]
         lower = lower_limit or self.lower_natural_process_limit()
 
+        # TODO: change arguments to take lists
         return self._points_beyond_limits(self.counts, upper, lower)
 
     def rule_1_mr_indices_beyond_limits(self) -> list[bool]:
@@ -234,7 +235,8 @@ class XmR:
         """
         result = [False] * len(self.counts)
 
-        unpl = self.upper_natural_process_limit()
+        # TODO: convert to check each value
+        unpl = self.upper_natural_process_limit()[0]
         lnpl = self.lower_natural_process_limit()
         upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
         lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl

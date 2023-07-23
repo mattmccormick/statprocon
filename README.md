@@ -18,7 +18,7 @@ counts = [10, 50, 40, 30]
 
 xmr = XmR(counts)
 moving_ranges = xmr.moving_ranges()
-unpl = xmr.upper_natural_process_limit()
+unpl = xmr.upper_natural_process_limit()[0]  # 85.7
 lnpl = xmr.lower_natural_process_limit()
 x_bar = xmr.x_central_line()[0]  # 32.5
 

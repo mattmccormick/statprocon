@@ -70,8 +70,7 @@ mr_cl    : [1.000, 1.000, 1.000]
     def test_upper_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
-        limit = xmr.upper_natural_process_limit()
-        self.assertEqual(limit, Decimal('172.364'))
+        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('172.364'))
 
     def test_lower_natural_process_limit(self):
         counts = [1, 10, 100, 50]
@@ -86,13 +85,13 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts[3] = 50
 
         xmr = XmR(counts, subset_end_index=24)
-        self.assertEqual(xmr.upper_natural_process_limit(), Decimal('30.442'))
+        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('30.442'))
         self.assertEqual(xmr.upper_range_limit(), Decimal('28.134'))
 
         # Adjust manually so that all subset values should be 1
         xmr.i = 4
         self._assert_line_equals(xmr, 'x_central_line', 1)
-        self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
+        self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit()[0])
 
     def test_rule_1_points_beyond_upper_limits(self):
         """
@@ -213,7 +212,7 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(x_avg, xmr.mean(counts))
         self.assertEqual(mr_avg, round(xmr.mr_central_line(), 2))
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 2))
-        self.assertEqual(unpl, round(xmr.upper_natural_process_limit(), 2))
+        self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 2))
         self.assertEqual(url, round(xmr.upper_range_limit(), 2))
 
     def test_peak_flow_rates(self):
@@ -238,7 +237,7 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(x_avg, round(xmr.mean(x_values), 1))
         self.assertEqual(mr_avg, round(xmr.mr_central_line(), 1))
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 1))
-        self.assertEqual(unpl, round(xmr.upper_natural_process_limit(), 1))
+        self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 1))
         self.assertEqual(url, round(xmr.upper_range_limit(), 1))
 
     def _assert_line_equals(self, xmr, func, value):
