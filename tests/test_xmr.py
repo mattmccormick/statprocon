@@ -40,7 +40,7 @@ mr_cl    : [1.000, 1.000, 1.000]
     def test_average_contains_one_more_exponent_as_input(self):
         counts = [3, 3, 4]
         xmr = XmR(counts)
-        self.assertEqual(xmr.x_central_line(), Decimal('3.333'))
+        self._assert_line_equals(xmr, 'x_central_line', Decimal('3.333'))
 
     def test_moving_range_ints(self):
         counts = [1, 10, 100, 50]
@@ -91,7 +91,7 @@ mr_cl    : [1.000, 1.000, 1.000]
 
         # Adjust manually so that all subset values should be 1
         xmr.i = 4
-        self.assertEqual(xmr.x_central_line(), 1)
+        self._assert_line_equals(xmr, 'x_central_line', 1)
         self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
 
     def test_rule_1_points_beyond_upper_limits(self):
@@ -240,3 +240,7 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 1))
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit(), 1))
         self.assertEqual(url, round(xmr.upper_range_limit(), 1))
+
+    def _assert_line_equals(self, xmr, func, value):
+        actual = getattr(xmr, func)()
+        self.assertListEqual(actual, [value] * len(xmr.counts))
