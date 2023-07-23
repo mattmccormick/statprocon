@@ -50,24 +50,21 @@ class XmR:
         """
         Return the values needed for the X chart as a dictionary
         """
-        n = len(self.counts)
         return {
             'values': self.counts,
-            'unpl': [self.upper_natural_process_limit()] * n,
-            'cl': [self.x_central_line()] * n,
-            'lnpl': [self.lower_natural_process_limit()] * n,
+            'unpl': self.upper_natural_process_limit(),
+            'cl': self.x_central_line(),
+            'lnpl': self.lower_natural_process_limit(),
         }
 
     def mr_to_dict(self) -> dict:
         """
         Return the values needed for the MR chart as a dictionary
         """
-        mr = self.moving_ranges()
-        n = len(mr)
         return {
-            'values': mr,
-            'url': [self.upper_range_limit()] * n,
-            'cl': [self.mr_central_line()] * n,
+            'values': self.moving_ranges(),
+            'url': self.upper_range_limit(),
+            'cl': self.mr_central_line(),
         }
 
     def to_dict(self) -> dict:
@@ -85,18 +82,16 @@ class XmR:
         output = io.StringIO()
         writer = csv.writer(output)
 
-        unpl = self.upper_natural_process_limit()
-        x_bar = self.x_central_line()
-        lnpl = self.lower_natural_process_limit()
-        moving_ranges = self.moving_ranges()
-        url = self.upper_range_limit()
-        mr_bar = self.mr_central_line()
-
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
-        for i, x in enumerate(self.counts):
-            row = [x, unpl, x_bar, lnpl, moving_ranges[i], url, mr_bar]
-            writer.writerow(row)
-
+        writer.writerows(zip(
+            self.counts,
+            self.upper_natural_process_limit(),
+            self.x_central_line(),
+            self.lower_natural_process_limit(),
+            self.moving_ranges(),
+            self.upper_range_limit(),
+            self.mr_central_line()
+        ))
         return output.getvalue()
 
     def moving_ranges(self) -> TYPE_MOVING_RANGES:
@@ -117,31 +112,33 @@ class XmR:
         self._mr = result
         return self._mr
 
-    def x_central_line(self) -> Decimal:
+    def x_central_line(self) -> Sequence[Decimal]:
         avg = self.mean(self.counts[self.i:self.j])
-        return self.round(avg)
+        return [self.round(avg)] * len(self.counts)
 
-    def mr_central_line(self) -> Decimal:
-        assert self.moving_ranges()[0] is None
-        valid_values = cast(TYPE_COUNTS, self.moving_ranges()[self.i+1:self.j])
+    def mr_central_line(self) -> Sequence[Decimal]:
+        mr = self.moving_ranges()
+        assert mr[0] is None
+        valid_values = cast(TYPE_COUNTS, mr[self.i+1:self.j])
         avg = self.mean(valid_values)
-        return self.round(avg)
+        return [self.round(avg)] * len(mr)
 
-    def upper_range_limit(self) -> Decimal:
-        limit = Decimal('3.268') * self.mr_central_line()
-        return self.round(limit)
+    def upper_range_limit(self) -> Sequence[Decimal]:
+        mr_cl = self.mr_central_line()
+        limit = Decimal('3.268') * mr_cl[0]
+        return [self.round(limit)] * len(mr_cl)
 
-    def upper_natural_process_limit(self) -> Decimal:
-        limit = self.x_central_line() + (Decimal('2.660') * self.mr_central_line())
-        return self.round(limit)
+    def upper_natural_process_limit(self) -> Sequence[Decimal]:
+        limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line()[0])
+        return [self.round(limit)] * len(self.counts)
 
-    def lower_natural_process_limit(self) -> Decimal:
+    def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
         LNPL can be negative.
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
-        limit = self.x_central_line() - (Decimal('2.660') * self.mr_central_line())
-        return self.round(limit)
+        limit = self.x_central_line()[0] - (Decimal('2.660') * self.mr_central_line()[0])
+        return [self.round(limit)] * len(self.counts)
 
     def rule_1_x_indices_beyond_limits(
             self,
@@ -162,9 +159,14 @@ class XmR:
         :return: list[bool] A list of boolean values of length(counts)
             True at index i means that self.counts[i] is above the upper_limit or below the lower_limit
         """
+        n = len(self.counts)
+        upper = self.upper_natural_process_limit()
+        if upper_limit:
+            upper = [upper_limit] * n
 
-        upper = upper_limit or self.upper_natural_process_limit()
-        lower = lower_limit or self.lower_natural_process_limit()
+        lower = self.lower_natural_process_limit()
+        if lower_limit:
+            lower = [lower_limit] * n
 
         return self._points_beyond_limits(self.counts, upper, lower)
 
@@ -234,16 +236,14 @@ class XmR:
         """
         result = [False] * len(self.counts)
 
-        unpl = self.upper_natural_process_limit()
-        lnpl = self.lower_natural_process_limit()
-        upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
-        lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl
-
         # positive value is point near upper limit
         # negative value is point near lower limit
         near_limits = [0] * len(self.counts)
 
-        for i, x in enumerate(self.counts):
+        values = zip(self.counts, self.upper_natural_process_limit(), self.lower_natural_process_limit())
+        for i, (x, unpl, lnpl) in enumerate(values):
+            upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
+            lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl
             if x < lower_25:
                 near_limits[i] = -1
 
@@ -258,21 +258,25 @@ class XmR:
 
         return result
 
-    def round(self, value: Decimal):
+    def round(self, value: Decimal) -> Decimal:
         return round(value, self.ROUNDING)
 
     @staticmethod
     def _points_beyond_limits(
             data: TYPE_COUNTS | TYPE_MOVING_RANGES,
-            upper_limit: Decimal,
-            lower_limit: Decimal = Decimal('0')
+            upper_limits: Sequence[Decimal],
+            lower_limits: Optional[Sequence[Decimal]] = None
     ) -> list[bool]:
         result = [False] * len(data)
-        for i, val in enumerate(data):
-            if val is None:
+
+        if lower_limits is None:
+            lower_limits = [Decimal('-Inf')] * len(upper_limits)
+
+        for i, (x, w, y) in enumerate(zip(data, lower_limits, upper_limits)):
+            if x is None:  # first index of Moving Ranges
                 continue
 
-            if not lower_limit <= val <= upper_limit:
+            if not w <= x <= y:
                 result[i] = True
 
         return result

@@ -18,12 +18,12 @@ counts = [10, 50, 40, 30]
 
 xmr = XmR(counts)
 moving_ranges = xmr.moving_ranges()
-unpl = xmr.upper_natural_process_limit()
-lnpl = xmr.lower_natural_process_limit()
-x_bar = xmr.x_central_line()
+unpl = xmr.upper_natural_process_limit()[0]  # 85.7
+lnpl = xmr.lower_natural_process_limit()[0]  # -20.7
+x_cl = xmr.x_central_line()[0]  # 32.5
 
-url = xmr.upper_range_limit()
-mr_bar = xmr.mr_central_line()
+url = xmr.upper_range_limit()[0]  # 65.36
+mr_cl = xmr.mr_central_line()[0]  # 20
 
 ```
 
@@ -82,7 +82,19 @@ If LNPL is not needed, remove it with the following steps:
 
 The LNPL line will be removed from the X Chart.
 
+## Advanced Usage
 
+### Calculate Limits from Subset of Counts
+
+The central lines and limits calculations can be restricted to a subset of the count data.
+Use the `subset_start_index` and `subset_end_index` parameters when instantiating the XmR object:
+
+```python
+xmr = XmR(counts, subset_start_index=10, subset_end_index=34)  # 24 points of data starting at index 10
+```
+
+When one or both of these optional arguments are provided, the the X and MR central line calculations will be modified to only use the data from `subset_start_index` up to, but not including, `subset_end_index`.
+When these optional arguments are not provided, `subset_start_index` defaults to 0 and `subset_end_index` defaults to the length of `counts`.
 
 ## Dependencies
 

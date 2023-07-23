@@ -2,6 +2,10 @@
 
 ---
 
+## 0.0.9
+
+- Change return type of central_line and limits methods to return a list instead of a scalar value
+
 ## 0.0.8
 
 - Standardize `to_dict` keys

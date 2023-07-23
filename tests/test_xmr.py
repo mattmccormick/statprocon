@@ -40,7 +40,7 @@ mr_cl    : [1.000, 1.000, 1.000]
     def test_average_contains_one_more_exponent_as_input(self):
         counts = [3, 3, 4]
         xmr = XmR(counts)
-        self.assertEqual(xmr.x_central_line(), Decimal('3.333'))
+        self._assert_line_equals(xmr, 'x_central_line', Decimal('3.333'))
 
     def test_moving_range_ints(self):
         counts = [1, 10, 100, 50]
@@ -64,20 +64,17 @@ mr_cl    : [1.000, 1.000, 1.000]
     def test_upper_range_limit(self):
         counts = [1,51, 100, 50]
         xmr = XmR(counts)
-        url = xmr.upper_range_limit()
-        self.assertEqual(url, Decimal('162.312'))
+        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('162.312'))
 
     def test_upper_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
-        limit = xmr.upper_natural_process_limit()
-        self.assertEqual(limit, Decimal('172.364'))
+        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('172.364'))
 
     def test_lower_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
-        limit = xmr.lower_natural_process_limit()
-        self.assertEqual(limit, Decimal('-91.864'))
+        self._assert_line_equals(xmr, 'lower_natural_process_limit', Decimal('-91.864'))
 
     def test_limits_with_subsets(self):
         counts = [1] * 25
@@ -86,12 +83,12 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts[3] = 50
 
         xmr = XmR(counts, subset_end_index=24)
-        self.assertEqual(xmr.upper_natural_process_limit(), Decimal('30.442'))
-        self.assertEqual(xmr.upper_range_limit(), Decimal('28.134'))
+        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('30.442'))
+        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('28.134'))
 
         # Adjust manually so that all subset values should be 1
         xmr.i = 4
-        self.assertEqual(xmr.x_central_line(), 1)
+        self._assert_line_equals(xmr, 'x_central_line', 1)
         self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
 
     def test_rule_1_points_beyond_upper_limits(self):
@@ -211,10 +208,10 @@ mr_cl    : [1.000, 1.000, 1.000]
 
         self.assertListEqual(xmr.moving_ranges(), moving_ranges)
         self.assertEqual(x_avg, xmr.mean(counts))
-        self.assertEqual(mr_avg, round(xmr.mr_central_line(), 2))
-        self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 2))
-        self.assertEqual(unpl, round(xmr.upper_natural_process_limit(), 2))
-        self.assertEqual(url, round(xmr.upper_range_limit(), 2))
+        self.assertEqual(mr_avg, round(xmr.mr_central_line()[0], 2))
+        self.assertEqual(lnpl, round(xmr.lower_natural_process_limit()[0], 2))
+        self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 2))
+        self.assertEqual(url, round(xmr.upper_range_limit()[0], 2))
 
     def test_peak_flow_rates(self):
         """
@@ -236,7 +233,11 @@ mr_cl    : [1.000, 1.000, 1.000]
 
         self.assertListEqual(xmr.moving_ranges(), mr_values)
         self.assertEqual(x_avg, round(xmr.mean(x_values), 1))
-        self.assertEqual(mr_avg, round(xmr.mr_central_line(), 1))
-        self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 1))
-        self.assertEqual(unpl, round(xmr.upper_natural_process_limit(), 1))
-        self.assertEqual(url, round(xmr.upper_range_limit(), 1))
+        self.assertEqual(mr_avg, round(xmr.mr_central_line()[0], 1))
+        self.assertEqual(lnpl, round(xmr.lower_natural_process_limit()[0], 1))
+        self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 1))
+        self.assertEqual(url, round(xmr.upper_range_limit()[0], 1))
+
+    def _assert_line_equals(self, xmr, func, value):
+        actual = getattr(xmr, func)()
+        self.assertListEqual(actual, [value] * len(xmr.counts))
