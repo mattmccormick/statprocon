@@ -50,7 +50,6 @@ class XmR:
         """
         Return the values needed for the X chart as a dictionary
         """
-        n = len(self.counts)
         return {
             'values': self.counts,
             'unpl': self.upper_natural_process_limit(),
@@ -62,10 +61,8 @@ class XmR:
         """
         Return the values needed for the MR chart as a dictionary
         """
-        mr = self.moving_ranges()
-        n = len(mr)
         return {
-            'values': mr,
+            'values': self.moving_ranges(),
             'url': self.upper_range_limit(),
             'cl': self.mr_central_line(),
         }
