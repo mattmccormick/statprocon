@@ -66,7 +66,7 @@ class XmR:
         n = len(mr)
         return {
             'values': mr,
-            'url': [self.upper_range_limit()] * n,
+            'url': self.upper_range_limit(),
             'cl': self.mr_central_line(),
         }
 
@@ -94,7 +94,7 @@ class XmR:
 
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
         for i, x in enumerate(self.counts):
-            row = [x, unpl[i], x_cl[i], lnpl, moving_ranges[i], url, mr_cl[i]]
+            row = [x, unpl[i], x_cl[i], lnpl, moving_ranges[i], url[i], mr_cl[i]]
             writer.writerow(row)
 
         return output.getvalue()
@@ -128,9 +128,10 @@ class XmR:
         avg = self.mean(valid_values)
         return [self.round(avg)] * len(mr)
 
-    def upper_range_limit(self) -> Decimal:
-        limit = Decimal('3.268') * self.mr_central_line()[0]
-        return self.round(limit)
+    def upper_range_limit(self) -> Sequence[Decimal]:
+        mr_cl = self.mr_central_line()
+        limit = Decimal('3.268') * mr_cl[0]
+        return [self.round(limit)] * len(mr_cl)
 
     def upper_natural_process_limit(self) -> Sequence[Decimal]:
         limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line()[0])
@@ -182,7 +183,7 @@ class XmR:
         :return: list[bool] A list of boolean values of length(self.moving_ranges())
             True at index i means that self.moving_ranges()[i] is above the Upper Range Limit
         """
-        return self._points_beyond_limits(self.moving_ranges(), self.upper_range_limit())
+        return self._points_beyond_limits(self.moving_ranges(), self.upper_range_limit()[0])
 
     def rule_2_runs_about_central_line(self) -> list[bool]:
         """
