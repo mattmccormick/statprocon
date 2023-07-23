@@ -55,7 +55,7 @@ class XmR:
             'values': self.counts,
             'unpl': self.upper_natural_process_limit(),
             'cl': self.x_central_line(),
-            'lnpl': [self.lower_natural_process_limit()] * n,
+            'lnpl': self.lower_natural_process_limit(),
         }
 
     def mr_to_dict(self) -> dict:
@@ -94,7 +94,7 @@ class XmR:
 
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
         for i, x in enumerate(self.counts):
-            row = [x, unpl[i], x_cl[i], lnpl, moving_ranges[i], url[i], mr_cl[i]]
+            row = [x, unpl[i], x_cl[i], lnpl[i], moving_ranges[i], url[i], mr_cl[i]]
             writer.writerow(row)
 
         return output.getvalue()
@@ -137,13 +137,13 @@ class XmR:
         limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line()[0])
         return [self.round(limit)] * len(self.counts)
 
-    def lower_natural_process_limit(self) -> Decimal:
+    def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
         LNPL can be negative.
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
         limit = self.x_central_line()[0] - (Decimal('2.660') * self.mr_central_line()[0])
-        return self.round(limit)
+        return [self.round(limit)] * len(self.counts)
 
     def rule_1_x_indices_beyond_limits(
             self,
@@ -166,7 +166,7 @@ class XmR:
         """
 
         upper = upper_limit or self.upper_natural_process_limit()[0]
-        lower = lower_limit or self.lower_natural_process_limit()
+        lower = lower_limit or self.lower_natural_process_limit()[0]
 
         # TODO: change arguments to take lists
         return self._points_beyond_limits(self.counts, upper, lower)
@@ -239,7 +239,7 @@ class XmR:
 
         # TODO: convert to check each value
         unpl = self.upper_natural_process_limit()[0]
-        lnpl = self.lower_natural_process_limit()
+        lnpl = self.lower_natural_process_limit()[0]
         upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
         lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl
 

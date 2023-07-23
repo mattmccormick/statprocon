@@ -19,7 +19,7 @@ counts = [10, 50, 40, 30]
 xmr = XmR(counts)
 moving_ranges = xmr.moving_ranges()
 unpl = xmr.upper_natural_process_limit()[0]  # 85.7
-lnpl = xmr.lower_natural_process_limit()
+lnpl = xmr.lower_natural_process_limit()[0]  # -20.7
 x_cl = xmr.x_central_line()[0]  # 32.5
 
 url = xmr.upper_range_limit()[0]  # 65.36
