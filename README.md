@@ -48,6 +48,7 @@ pd.DataFrame(xmr.x_to_dict()).astype(float).plot()
 pd.DataFrame(xmr.mr_to_dict()).astype(float).plot()
 ```
 
+![Screenshot from 2023-07-22 13-53-22](https://github.com/mattmccormick/statprocon/assets/436801/b6a83903-4bb9-4935-9acb-c086d3420fd2)
 
 
 ### CSV
