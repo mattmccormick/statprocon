@@ -238,17 +238,14 @@ class XmR:
         """
         result = [False] * len(self.counts)
 
-        # TODO: convert to check each value
-        unpl = self.upper_natural_process_limit()[0]
-        lnpl = self.lower_natural_process_limit()[0]
-        upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
-        lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl
-
         # positive value is point near upper limit
         # negative value is point near lower limit
         near_limits = [0] * len(self.counts)
 
-        for i, x in enumerate(self.counts):
+        values = zip(self.counts, self.upper_natural_process_limit(), self.lower_natural_process_limit())
+        for i, (x, unpl, lnpl) in enumerate(values):
+            upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
+            lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl
             if x < lower_25:
                 near_limits[i] = -1
 
