@@ -85,16 +85,17 @@ class XmR:
         output = io.StringIO()
         writer = csv.writer(output)
 
-        unpl = self.upper_natural_process_limit()
-        x_cl = self.x_central_line()
-        lnpl = self.lower_natural_process_limit()
-        moving_ranges = self.moving_ranges()
-        url = self.upper_range_limit()
-        mr_cl = self.mr_central_line()
-
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
-        for i, x in enumerate(self.counts):
-            row = [x, unpl[i], x_cl[i], lnpl[i], moving_ranges[i], url[i], mr_cl[i]]
+        for x, unpl, x_cl, lnpl, mr, url, mr_cl in zip(
+            self.counts,
+            self.upper_natural_process_limit(),
+            self.x_central_line(),
+            self.lower_natural_process_limit(),
+            self.moving_ranges(),
+            self.upper_range_limit(),
+            self.mr_central_line()
+        ):
+            row = [x, unpl, x_cl, lnpl, mr, url, mr_cl]
             writer.writerow(row)
 
         return output.getvalue()
