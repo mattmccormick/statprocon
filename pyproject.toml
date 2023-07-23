@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "statprocon"
-version = "0.0.8"
+version = "0.0.9"
 authors = [
   { name="Matt McCormick", email="mattmccor@gmail.com" },
 ]
