@@ -67,7 +67,7 @@ class XmR:
         return {
             'values': mr,
             'url': [self.upper_range_limit()] * n,
-            'cl': [self.mr_central_line()] * n,
+            'cl': self.mr_central_line(),
         }
 
     def to_dict(self) -> dict:
@@ -94,7 +94,7 @@ class XmR:
 
         writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
         for i, x in enumerate(self.counts):
-            row = [x, unpl[i], x_cl[i], lnpl, moving_ranges[i], url, mr_cl]
+            row = [x, unpl[i], x_cl[i], lnpl, moving_ranges[i], url, mr_cl[i]]
             writer.writerow(row)
 
         return output.getvalue()
@@ -121,18 +121,19 @@ class XmR:
         avg = self.mean(self.counts[self.i:self.j])
         return [self.round(avg)] * len(self.counts)
 
-    def mr_central_line(self) -> Decimal:
-        assert self.moving_ranges()[0] is None
-        valid_values = cast(TYPE_COUNTS, self.moving_ranges()[self.i+1:self.j])
+    def mr_central_line(self) -> Sequence[Decimal]:
+        mr = self.moving_ranges()
+        assert mr[0] is None
+        valid_values = cast(TYPE_COUNTS, mr[self.i+1:self.j])
         avg = self.mean(valid_values)
-        return self.round(avg)
+        return [self.round(avg)] * len(mr)
 
     def upper_range_limit(self) -> Decimal:
-        limit = Decimal('3.268') * self.mr_central_line()
+        limit = Decimal('3.268') * self.mr_central_line()[0]
         return self.round(limit)
 
     def upper_natural_process_limit(self) -> Sequence[Decimal]:
-        limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line())
+        limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line()[0])
         return [self.round(limit)] * len(self.counts)
 
     def lower_natural_process_limit(self) -> Decimal:
@@ -140,7 +141,7 @@ class XmR:
         LNPL can be negative.
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
-        limit = self.x_central_line()[0] - (Decimal('2.660') * self.mr_central_line())
+        limit = self.x_central_line()[0] - (Decimal('2.660') * self.mr_central_line()[0])
         return self.round(limit)
 
     def rule_1_x_indices_beyond_limits(

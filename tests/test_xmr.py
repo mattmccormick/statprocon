@@ -210,7 +210,7 @@ mr_cl    : [1.000, 1.000, 1.000]
 
         self.assertListEqual(xmr.moving_ranges(), moving_ranges)
         self.assertEqual(x_avg, xmr.mean(counts))
-        self.assertEqual(mr_avg, round(xmr.mr_central_line(), 2))
+        self.assertEqual(mr_avg, round(xmr.mr_central_line()[0], 2))
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 2))
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 2))
         self.assertEqual(url, round(xmr.upper_range_limit(), 2))
@@ -235,7 +235,7 @@ mr_cl    : [1.000, 1.000, 1.000]
 
         self.assertListEqual(xmr.moving_ranges(), mr_values)
         self.assertEqual(x_avg, round(xmr.mean(x_values), 1))
-        self.assertEqual(mr_avg, round(xmr.mr_central_line(), 1))
+        self.assertEqual(mr_avg, round(xmr.mr_central_line()[0], 1))
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit(), 1))
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 1))
         self.assertEqual(url, round(xmr.upper_range_limit(), 1))
