@@ -3,7 +3,7 @@ import io
 
 from decimal import Decimal
 from packaging.markers import Marker
-from typing import cast, Union, Optional, Sequence
+from typing import cast, Union, Optional, Sequence, List
 
 py310 = Marker('python_version >= "3.10"')
 if py310.evaluate():
@@ -152,8 +152,8 @@ class XmR:
     def rule_1_x_indices_beyond_limits(
             self,
             upper_limit: Optional[Decimal] = None,
-            lower_limit: Optional[Decimal] = None
-    ) -> list[bool]:
+            lower_limit: Optional[Decimal] = None,
+    ) -> List[bool]:
         """
         Points Outside the Limits
 
@@ -179,7 +179,7 @@ class XmR:
 
         return self._points_beyond_limits(self.counts, upper, lower)
 
-    def rule_1_mr_indices_beyond_limits(self) -> list[bool]:
+    def rule_1_mr_indices_beyond_limits(self) -> List[bool]:
         """
         Points Outside the Limits
 
@@ -193,7 +193,7 @@ class XmR:
         """
         return self._points_beyond_limits(self.moving_ranges(), self.upper_range_limit())
 
-    def rule_2_runs_about_central_line(self) -> list[bool]:
+    def rule_2_runs_about_central_line(self) -> List[bool]:
         """
         Runs About the Central Line
 
@@ -233,7 +233,7 @@ class XmR:
 
         return result
 
-    def rule_3_runs_near_limits(self) -> list[bool]:
+    def rule_3_runs_near_limits(self) -> List[bool]:
         """
         Runs Near the Limits
 
@@ -275,7 +275,7 @@ class XmR:
             data: TYPE_MOVING_RANGES,
             upper_limits: Sequence[Decimal],
             lower_limits: Optional[Sequence[Decimal]] = None
-    ) -> list[bool]:
+    ) -> List[bool]:
         result = [False] * len(data)
 
         if lower_limits is None:
