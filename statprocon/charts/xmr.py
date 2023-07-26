@@ -2,12 +2,21 @@ import csv
 import io
 
 from decimal import Decimal
-from typing import cast, Union, Optional, Sequence, TypeAlias
+from packaging.markers import Marker
+from typing import cast, Union, Optional, Sequence, List
 
-TYPE_COUNT_VALUE: TypeAlias = Decimal | int
-TYPE_MOVING_RANGE_VALUE: TypeAlias = Decimal | int | None
+py310 = Marker('python_version >= "3.10"')
+if py310.evaluate():
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
 
-TYPE_COUNTS: TypeAlias = Sequence[TYPE_COUNT_VALUE | float]
+# TODO: can replace Union with | when only supporting >= 3.10
+TYPE_COUNT_VALUE: TypeAlias = Union[Decimal, int]
+TYPE_MOVING_RANGE_VALUE: TypeAlias = Union[Decimal, int, None]
+
+TYPE_COUNTS_INPUT: TypeAlias = Sequence[Union[TYPE_COUNT_VALUE, float]]
+TYPE_COUNTS: TypeAlias = Sequence[TYPE_COUNT_VALUE]
 TYPE_MOVING_RANGES: TypeAlias = Sequence[TYPE_MOVING_RANGE_VALUE]
 
 
@@ -16,13 +25,13 @@ class XmR:
 
     def __init__(
             self,
-            counts: TYPE_COUNTS,
+            counts: TYPE_COUNTS_INPUT,
             subset_start_index: int = 0,
             subset_end_index: Optional[int] = None,
     ):
         """
 
-        :param counts: TYPE_COUNTS list of data to be used by the X chart
+        :param counts: list of data to be used by the X chart
         :param subset_start_index: Optional starting index of counts to calculate limits from
         :param subset_end_index: Optional ending index of counts to calculate limits to
         """
@@ -107,7 +116,7 @@ class XmR:
             if i == 0:
                 result.append(None)
             else:
-                value = cast(Union[Decimal | int], abs(c - self.counts[i - 1]))
+                value = cast(Union[Decimal, int], abs(c - self.counts[i - 1]))
                 result.append(value)
         self._mr = result
         return self._mr
@@ -143,8 +152,8 @@ class XmR:
     def rule_1_x_indices_beyond_limits(
             self,
             upper_limit: Optional[Decimal] = None,
-            lower_limit: Optional[Decimal] = None
-    ) -> list[bool]:
+            lower_limit: Optional[Decimal] = None,
+    ) -> List[bool]:
         """
         Points Outside the Limits
 
@@ -170,7 +179,7 @@ class XmR:
 
         return self._points_beyond_limits(self.counts, upper, lower)
 
-    def rule_1_mr_indices_beyond_limits(self) -> list[bool]:
+    def rule_1_mr_indices_beyond_limits(self) -> List[bool]:
         """
         Points Outside the Limits
 
@@ -184,7 +193,7 @@ class XmR:
         """
         return self._points_beyond_limits(self.moving_ranges(), self.upper_range_limit())
 
-    def rule_2_runs_about_central_line(self) -> list[bool]:
+    def rule_2_runs_about_central_line(self) -> List[bool]:
         """
         Runs About the Central Line
 
@@ -224,7 +233,7 @@ class XmR:
 
         return result
 
-    def rule_3_runs_near_limits(self) -> list[bool]:
+    def rule_3_runs_near_limits(self) -> List[bool]:
         """
         Runs Near the Limits
 
@@ -263,10 +272,10 @@ class XmR:
 
     @staticmethod
     def _points_beyond_limits(
-            data: TYPE_COUNTS | TYPE_MOVING_RANGES,
+            data: TYPE_MOVING_RANGES,
             upper_limits: Sequence[Decimal],
             lower_limits: Optional[Sequence[Decimal]] = None
-    ) -> list[bool]:
+    ) -> List[bool]:
         result = [False] * len(data)
 
         if lower_limits is None:
