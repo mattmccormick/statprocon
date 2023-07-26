@@ -10,13 +10,17 @@ authors = [
 ]
 description = "A Python helper library for generating Process Behaviour Charts"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 keywords = ["Statistical Process Control", "SPC", "Quality Control Chart", "QCC", "Process Behaviour Chart", "Process Behavior Chart", "XmR", "Shewhart", "Wheeler"]
+dependencies = [
+    "packaging",
+    "typing_extensions",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/mattmccormick/statprocon"
