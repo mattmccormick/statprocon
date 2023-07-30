@@ -82,12 +82,9 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts[2] = 100
         counts[3] = 50
 
-        xmr = XmR(counts, subset_end_index=24)
-        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('30.442'))
-        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('28.134'))
-
-        # Adjust manually so that all subset values should be 1
-        xmr.i = 4
+        xmr = XmR(counts, subset_start_index=4, subset_end_index=24)
+        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('1.000'))
+        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('0'))
         self._assert_line_equals(xmr, 'x_central_line', 1)
         self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
 
@@ -207,7 +204,7 @@ mr_cl    : [1.000, 1.000, 1.000]
         xmr = XmR(counts)
 
         self.assertListEqual(xmr.moving_ranges(), moving_ranges)
-        self.assertEqual(x_avg, xmr.mean(counts))
+        self.assertEqual(x_avg, xmr.x_central_line()[0])
         self.assertEqual(mr_avg, round(xmr.mr_central_line()[0], 2))
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit()[0], 2))
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 2))
@@ -232,7 +229,7 @@ mr_cl    : [1.000, 1.000, 1.000]
         xmr = XmR(x_values)
 
         self.assertListEqual(xmr.moving_ranges(), mr_values)
-        self.assertEqual(x_avg, round(xmr.mean(x_values), 1))
+        self.assertEqual(x_avg, round(xmr.x_central_line()[0], 1))
         self.assertEqual(mr_avg, round(xmr.mr_central_line()[0], 1))
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit()[0], 1))
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 1))

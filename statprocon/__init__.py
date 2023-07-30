@@ -1,1 +1,1 @@
-from .charts.xmr import XmR
+from .charts.xmr.base import Base as XmR

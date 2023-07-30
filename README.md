@@ -140,5 +140,5 @@ python3 -m pip install .
 
 Run tests
 ```shell
-python3 -m unittest discover
+tox
 ```
