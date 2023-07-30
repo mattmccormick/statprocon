@@ -20,7 +20,7 @@ TYPE_COUNTS: TypeAlias = Sequence[TYPE_COUNT_VALUE]
 TYPE_MOVING_RANGES: TypeAlias = Sequence[TYPE_MOVING_RANGE_VALUE]
 
 
-class XmR:
+class Base:
     ROUNDING = 3
 
     def __init__(
