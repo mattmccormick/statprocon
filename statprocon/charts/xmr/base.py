@@ -124,11 +124,7 @@ class Base:
         return self._cl.x()
 
     def mr_central_line(self) -> Sequence[Decimal]:
-        mr = self.moving_ranges()
-        assert mr[0] is None
-        valid_values = cast(TYPE_COUNTS, mr[self.i+1:self.j])
-        avg = self.mean(valid_values)
-        return [round(avg, ROUNDING)] * len(mr)
+        return self._cl.mr(self.moving_ranges())
 
     def upper_range_limit(self) -> Sequence[Decimal]:
         mr_cl = self.mr_central_line()
