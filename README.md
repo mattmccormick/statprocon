@@ -84,6 +84,14 @@ The LNPL line will be removed from the X Chart.
 
 ## Advanced Usage
 
+### Use the Median Moving Range
+
+If your data contains extreme outliers, it may be better to compute the limits using the median moving range.
+
+```python
+xmr = XmR(counts, moving_range_uses='median')
+```
+
 ### Calculate Limits from Subset of Counts
 
 The central lines and limits calculations can be restricted to a subset of the count data.

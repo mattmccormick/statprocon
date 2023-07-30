@@ -233,6 +233,26 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 1))
         self.assertEqual(url, round(xmr.upper_range_limit()[0], 1))
 
+    def test_median_moving_range(self):
+        # Data comes from pg. 145 of Making Sense of Data
+        # Section 10.2 Using the Median Moving Range
+        x_values = [2.5, 2.3, 16.3, 6.3, 7.6, 16.3, 7.1, 7.8, 7.8, 9.9, 10.5, -4.8]
+        mr_values = [None, 0.2, 14, 10, 1.3, 8.7, 9.2, 0.7, 0, 2.1, 0.6, 15.3]
+        x_cl = Decimal('7.467')  # 7.47 in book
+        mr_cl = Decimal('2.10')
+        unpl = Decimal('14.072')  # 14.07 in book
+        lnpl = Decimal('0.862')  # 0.87 in book
+        url = Decimal('8.116')  # 8.12 in book
+
+        xmr = XmR(x_values, moving_range_uses='median')
+
+        self.assertListEqual(xmr.moving_ranges(), xmr.to_decimal_list(mr_values))
+        self.assertEqual(x_cl, xmr.x_central_line()[0])
+        self.assertEqual(mr_cl, xmr.mr_central_line()[0])
+        self.assertEqual(lnpl, xmr.lower_natural_process_limit()[0])
+        self.assertEqual(unpl, xmr.upper_natural_process_limit()[0])
+        self.assertEqual(url, xmr.upper_range_limit()[0])
+
     def _assert_line_equals(self, xmr, func, value):
         actual = getattr(xmr, func)()
         self.assertListEqual(actual, [value] * len(xmr.counts))
