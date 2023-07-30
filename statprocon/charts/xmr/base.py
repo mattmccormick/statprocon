@@ -43,7 +43,8 @@ class Base:
 
         :param counts: list of data to be used by the X chart
         :param x_central_line_uses: Whether to use the 'average' or 'median' for computing the X
-            central line.  Defaults to average.
+            central line.  Defaults to average.  If set to median, moving_range_uses will also be
+            set to median.
         :param moving_range_uses: Whether to use the 'average' or 'median' moving range.
             Defaults to average.
         :param subset_start_index: Optional starting index of counts to calculate limits from
@@ -62,7 +63,10 @@ class Base:
         assert self.i <= self.j
 
         self._x_central_line_uses = x_central_line_uses
-        self._moving_range_uses = moving_range_uses
+        if x_central_line_uses == MEDIAN:
+            self._moving_range_uses = MEDIAN
+        else:
+            self._moving_range_uses = moving_range_uses
 
     def __repr__(self) -> str:
         result = ''
@@ -142,10 +146,11 @@ class Base:
         return self._mr
 
     def x_central_line(self) -> Sequence[Decimal]:
+        valid_values = self.counts[self.i:self.j]
         if self._x_central_line_uses == AVERAGE:
-            value = self._mean(self.counts[self.i:self.j])
+            value = self._mean(valid_values)
         elif self._x_central_line_uses == MEDIAN:
-            raise NotImplemented
+            value = statistics.median(valid_values)  # type: ignore[type-var,assignment]
 
         return [round(value, ROUNDING)] * len(self.counts)
 

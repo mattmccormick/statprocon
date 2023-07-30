@@ -3,6 +3,11 @@
 **statprocon** is a Python helper library for generating data for use in **Stat**istical **Pro**cess **Con**trol charts.
 SPC charts are also known as Process Behaviour Charts, Control charts or Shewhart charts.
 
+SPC Charts help answer questions like:
+- How do I know a change has occurred in a process?
+- What is the expected variation in a process?
+- Is a process stable or unpredictable?
+
 ## Installation
 
 ```shell
@@ -28,7 +33,7 @@ mr_cl = xmr.mr_central_line()[0]  # 20
 ```
 
 Currently, this library only supports the data for generating an XmR chart.
-An XmR chart is the simplest type of process behaviour chart.
+An XmR chart is the most universal way of using process behaviour charts.
 XmR is short for individual values (X) and a moving range (mR).
 More chart data options can be added via pull requests.
 
@@ -90,6 +95,19 @@ If your data contains extreme outliers, it may be better to compute the limits u
 
 ```python
 xmr = XmR(counts, moving_range_uses='median')
+```
+
+### Use the Median for the X Central Line
+
+```python
+xmr = XmR(counts, x_central_line_uses='median')
+```
+
+Note: It's assumed that by using the median for the X central line that the median moving range should also be used.
+For example, you **cannot** do the following:
+
+```python
+xmr = XmR(counts, x_central_line_uses='median', moving_range_uses='average')
 ```
 
 ### Calculate Limits from Subset of Counts
