@@ -58,7 +58,7 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts = [5.4, 3.8, 8.75, 3.6, 3, 6, 7.4, 10, 5.8, 6.6, 3, 8.8]
         xmr = XmR(counts)
         mr = xmr.moving_ranges()
-        expected = [None, Decimal('1.6'), Decimal('4.95'), Decimal('5.15'), Decimal('0.6'), Decimal('3'), Decimal('1.4'), Decimal('2.6'), Decimal('4.2'), Decimal('0.8'), Decimal('3.6'), Decimal('5.8')]
+        expected = xmr.to_decimal_list([None, 1.6, 4.95, 5.15, 0.6, 3, 1.4, 2.6, 4.2, 0.8, 3.6, 5.8])
         self.assertListEqual(mr, expected)
 
     def test_upper_range_limit(self):
@@ -126,10 +126,9 @@ mr_cl    : [1.000, 1.000, 1.000]
 
         ar_pct_sales = [
             '55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2',
-            '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9'
+            '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9',
         ]
-        counts_dec = list(map(lambda x: Decimal(x), ar_pct_sales))
-        xmr = XmR(counts_dec)
+        xmr = XmR(ar_pct_sales)
 
         upper_limit = Decimal('60.7')
         expected = [False] * len(ar_pct_sales)
@@ -146,10 +145,11 @@ mr_cl    : [1.000, 1.000, 1.000]
         """
         This test dataset also comes from Table 9.2
         """
-        ar_pct_sales = ['55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2',
-                        '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9']
-        counts_dec = list(map(lambda x: Decimal(x), ar_pct_sales))
-        xmr = XmR(counts_dec)
+        ar_pct_sales = [
+            '55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2',
+            '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9',
+        ]
+        xmr = XmR(ar_pct_sales)
 
         expected = [False] * len(ar_pct_sales)
         expected[19] = True
@@ -177,8 +177,6 @@ mr_cl    : [1.000, 1.000, 1.000]
         """
 
         x_values = [120, 140, 100, 150, 260, 150, 100, 120, 300, 300, 275, 300, 140, 1750, 150, 150, 190, 180]
-        unpl = Decimal('322.5')
-        lnpl = Decimal('43.7')
 
         xmr = XmR(x_values)
 
@@ -218,8 +216,8 @@ mr_cl    : [1.000, 1.000, 1.000]
 
         x_values = [120, 140, 100, 150, 260, 150, 100, 120, 300, 300, 275, 300, 140, 170, 150, 150, 190, 180]
         mr_values = [None, 20, 40, 50, 110, 110, 50, 20, 180, 0, 25, 25, 160, 30, 20, 0, 40, 10]
-        x_avg = Decimal('183.1')
-        mr_avg = Decimal('52.4')
+        x_cl = Decimal('183.1')
+        mr_cl = Decimal('52.4')
 
         # changes are due to rounding
         unpl = Decimal('322.3')  # 322.5 in book
@@ -229,8 +227,8 @@ mr_cl    : [1.000, 1.000, 1.000]
         xmr = XmR(x_values)
 
         self.assertListEqual(xmr.moving_ranges(), mr_values)
-        self.assertEqual(x_avg, round(xmr.x_central_line()[0], 1))
-        self.assertEqual(mr_avg, round(xmr.mr_central_line()[0], 1))
+        self.assertEqual(x_cl, round(xmr.x_central_line()[0], 1))
+        self.assertEqual(mr_cl, round(xmr.mr_central_line()[0], 1))
         self.assertEqual(lnpl, round(xmr.lower_natural_process_limit()[0], 1))
         self.assertEqual(unpl, round(xmr.upper_natural_process_limit()[0], 1))
         self.assertEqual(url, round(xmr.upper_range_limit()[0], 1))

@@ -7,9 +7,11 @@ from typing import cast, List, Optional, Sequence, Union
 from . import central_line as cl
 from .constants import ROUNDING
 from .types import (
+    TYPE_COUNTS,
     TYPE_COUNTS_INPUT,
     TYPE_MOVING_RANGE_VALUE,
     TYPE_MOVING_RANGES,
+    TYPE_NUMERIC_INPUTS,
 )
 
 
@@ -30,7 +32,7 @@ class Base:
         :param subset_start_index: Optional starting index of counts to calculate limits from
         :param subset_end_index: Optional ending index of counts to calculate limits to
         """
-        self.counts = [Decimal(str(x)) for x in counts]
+        self.counts = cast(TYPE_COUNTS, self.to_decimal_list(counts))
         self._mr: TYPE_MOVING_RANGES = []
         self.i = max(0, subset_start_index)
         self.j = len(counts)
@@ -279,4 +281,14 @@ class Base:
             if not w <= x <= y:
                 result[i] = True
 
+        return result
+
+    @staticmethod
+    def to_decimal_list(values: TYPE_NUMERIC_INPUTS) -> TYPE_MOVING_RANGES:
+        result: List[Union[Decimal, None]] = []
+        for x in values:
+            if x is None:
+                result.append(None)
+            else:
+                result.append(Decimal(str(x)))
         return result
