@@ -2,6 +2,10 @@
 
 ---
 
+## 0.1.0
+
+- Add parameter `moving_range_uses` to accept `median` and compute the limits using the median moving range
+
 ## 0.0.10
 
 - Change minimum required Python version to 3.7

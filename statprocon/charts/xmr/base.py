@@ -1,36 +1,58 @@
 import csv
 import io
+import statistics
 
 from decimal import Decimal
 from typing import cast, List, Optional, Sequence, Union
 
-from . import central_line as cl
 from .constants import ROUNDING
 from .types import (
+    TYPE_COUNTS,
     TYPE_COUNTS_INPUT,
     TYPE_MOVING_RANGE_VALUE,
     TYPE_MOVING_RANGES,
+    TYPE_NUMERIC_INPUTS,
 )
 
 
-CENTRAL_LINE_AVERAGE = 'average'
+AVERAGE = 'average'
+MEDIAN = 'median'
+
+# Scaling Factors (SF)
+SF_LIMITS = {
+    AVERAGE: Decimal('2.660'),
+    MEDIAN: Decimal('3.145'),
+}
+
+SF_RANGES = {
+    AVERAGE: Decimal('3.268'),
+    MEDIAN: Decimal('3.865'),
+}
 
 
 class Base:
     def __init__(
             self,
             counts: TYPE_COUNTS_INPUT,
-            central_line: str = CENTRAL_LINE_AVERAGE,
+            x_central_line_uses: str = AVERAGE,
+            moving_range_uses: str = AVERAGE,
             subset_start_index: int = 0,
             subset_end_index: Optional[int] = None,
     ):
         """
 
         :param counts: list of data to be used by the X chart
+        :param x_central_line_uses: Whether to use the 'average' or 'median' for computing the X
+            central line.  Defaults to average.
+        :param moving_range_uses: Whether to use the 'average' or 'median' moving range.
+            Defaults to average.
         :param subset_start_index: Optional starting index of counts to calculate limits from
         :param subset_end_index: Optional ending index of counts to calculate limits to
         """
-        self.counts = [Decimal(str(x)) for x in counts]
+        assert x_central_line_uses in [AVERAGE, MEDIAN]
+        assert moving_range_uses in [AVERAGE, MEDIAN]
+
+        self.counts = cast(TYPE_COUNTS, self.to_decimal_list(counts))
         self._mr: TYPE_MOVING_RANGES = []
         self.i = max(0, subset_start_index)
         self.j = len(counts)
@@ -39,8 +61,8 @@ class Base:
 
         assert self.i <= self.j
 
-        if central_line == CENTRAL_LINE_AVERAGE:
-            self._cl = cl.Average(self.counts, self.i, self.j)
+        self._x_central_line_uses = x_central_line_uses
+        self._moving_range_uses = moving_range_uses
 
     def __repr__(self) -> str:
         result = ''
@@ -120,19 +142,42 @@ class Base:
         return self._mr
 
     def x_central_line(self) -> Sequence[Decimal]:
-        return self._cl.x()
+        if self._x_central_line_uses == AVERAGE:
+            value = self._mean(self.counts[self.i:self.j])
+        elif self._x_central_line_uses == MEDIAN:
+            raise NotImplemented
+
+        return [round(value, ROUNDING)] * len(self.counts)
 
     def mr_central_line(self) -> Sequence[Decimal]:
-        return self._cl.mr(self.moving_ranges())
+        mr = self.moving_ranges()
+        assert mr[0] is None
+        valid_values = cast(TYPE_COUNTS, mr[self.i + 1:self.j])
+
+        if self._moving_range_uses == AVERAGE:
+            value = self._mean(valid_values)
+        elif self._moving_range_uses == MEDIAN:
+            # mypy gives the error:
+            #   Value of type variable "_NumberT" of "median" cannot be "Decimal | int"
+            # However, the [statistics library](https://docs.python.org/3/library/statistics.html)
+            # says that the functions support int and Decimal
+            # When ignoring type-var, an assignment error appears:
+            #   Incompatible types in assignment (expression has type "Decimal | int", variable has type "Decimal")
+            # But the variable can be int and not necessarily Decimal
+            value = statistics.median(valid_values)  # type: ignore[type-var,assignment]
+
+        return [round(value, ROUNDING)] * len(mr)
 
     def upper_range_limit(self) -> Sequence[Decimal]:
+        sf = SF_RANGES[self._moving_range_uses]
         mr_cl = self.mr_central_line()
-        limit = Decimal('3.268') * mr_cl[0]
+        limit = sf * mr_cl[0]
         value = round(limit, ROUNDING)
         return [value] * len(mr_cl)
 
     def upper_natural_process_limit(self) -> Sequence[Decimal]:
-        limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line()[0])
+        sf = SF_LIMITS[self._moving_range_uses]
+        limit = self.x_central_line()[0] + (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
 
@@ -141,7 +186,8 @@ class Base:
         LNPL can be negative.
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
-        limit = self.x_central_line()[0] - (Decimal('2.660') * self.mr_central_line()[0])
+        sf = SF_LIMITS[self._moving_range_uses]
+        limit = self.x_central_line()[0] - (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
 
@@ -279,4 +325,20 @@ class Base:
             if not w <= x <= y:
                 result[i] = True
 
+        return result
+
+    @staticmethod
+    def _mean(nums: TYPE_COUNTS) -> Decimal:
+        s = sum(nums)
+        n = len(nums)
+        return Decimal(str(s)) / Decimal(str(n))
+
+    @staticmethod
+    def to_decimal_list(values: TYPE_NUMERIC_INPUTS) -> TYPE_MOVING_RANGES:
+        result: List[Union[Decimal, None]] = []
+        for x in values:
+            if x is None:
+                result.append(None)
+            else:
+                result.append(Decimal(str(x)))
         return result
