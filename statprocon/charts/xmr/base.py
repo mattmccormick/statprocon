@@ -7,7 +7,6 @@ from typing import cast, List, Optional, Sequence, Union
 from . import central_line as cl
 from .constants import ROUNDING
 from .types import (
-    TYPE_COUNTS,
     TYPE_COUNTS_INPUT,
     TYPE_MOVING_RANGE_VALUE,
     TYPE_MOVING_RANGES,
@@ -207,25 +206,23 @@ class Base:
 
         # positive is number of consecutive points above the line
         # negative is number of consecutive points below the line
-        central_line = 0
-
-        avg = self.mean(self.counts)
-        for i, x in enumerate(self.counts):
-            if x > avg:
-                if central_line < 0:
-                    central_line = 1
+        run = 0
+        for i, (x, cl) in enumerate(zip(self.counts, self.x_central_line())):
+            if x > cl:
+                if run < 0:
+                    run = 1
                 else:
-                    central_line += 1
-            elif x < avg:
-                if central_line > 0:
-                    central_line = -1
+                    run += 1
+            elif x < cl:
+                if run > 0:
+                    run = -1
                 else:
-                    central_line -= 1
+                    run -= 1
 
-            if abs(central_line) == 8:
+            if abs(run) == 8:
                 for j in range(8):
                     result[i - j] = True
-            elif abs(central_line) > 8:
+            elif abs(run) > 8:
                 result[i] = True
 
         return result
@@ -283,9 +280,3 @@ class Base:
                 result[i] = True
 
         return result
-
-    @staticmethod
-    def mean(nums: TYPE_COUNTS) -> Decimal:
-        s = sum(nums)
-        n = len(nums)
-        return Decimal(str(s)) / Decimal(str(n))
