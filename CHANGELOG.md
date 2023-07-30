@@ -2,6 +2,10 @@
 
 ---
 
+## 0.1.1
+
+- Add parameter `x_central_line_uses` to accept `median` and return the median for the X central line
+
 ## 0.1.0
 
 - Add parameter `moving_range_uses` to accept `median` and compute the limits using the median moving range

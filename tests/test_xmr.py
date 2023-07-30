@@ -253,6 +253,29 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(unpl, xmr.upper_natural_process_limit()[0])
         self.assertEqual(url, xmr.upper_range_limit()[0])
 
+    def test_median_x_central_line(self):
+        # Data comes from pg. 147 of Making Sense of Data
+        # s10.2 Episode Treatment Groups
+        x_values = [
+            260, 130, 189, 1080, 175, 200, 193, 120, 33,
+            293, 195, 571, 55698, 209, 1825, 239, 290, 254,
+            93, 278, 185, 123, 9434, 408, 570, 118, 238,
+            207, 153, 209, 243, 110, 306, 343, 244,
+        ]
+        x_cl = 238
+        mr_cl = 125
+        unpl = 631.125  # 630 in book
+        lnpl = -155.125  # -154 in book
+        url = 483.125  # 482 in book
+
+        xmr = XmR(x_values, x_central_line_uses='median')
+
+        self.assertEqual(x_cl, xmr.x_central_line()[0])
+        self.assertEqual(mr_cl, xmr.mr_central_line()[0])
+        self.assertEqual(lnpl, xmr.lower_natural_process_limit()[0])
+        self.assertEqual(unpl, xmr.upper_natural_process_limit()[0])
+        self.assertEqual(url, xmr.upper_range_limit()[0])
+
     def _assert_line_equals(self, xmr, func, value):
         actual = getattr(xmr, func)()
         self.assertListEqual(actual, [value] * len(xmr.counts))
