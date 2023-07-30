@@ -2,30 +2,26 @@ import csv
 import io
 
 from decimal import Decimal
-from packaging.markers import Marker
-from typing import cast, Union, Optional, Sequence, List
+from typing import cast, List, Optional, Sequence, Union
 
-py310 = Marker('python_version >= "3.10"')
-if py310.evaluate():
-    from typing import TypeAlias
-else:
-    from typing_extensions import TypeAlias
+from . import central_line as cl
+from .constants import ROUNDING
+from .types import (
+    TYPE_COUNTS,
+    TYPE_COUNTS_INPUT,
+    TYPE_MOVING_RANGE_VALUE,
+    TYPE_MOVING_RANGES,
+)
 
-# TODO: can replace Union with | when only supporting >= 3.10
-TYPE_COUNT_VALUE: TypeAlias = Union[Decimal, int]
-TYPE_MOVING_RANGE_VALUE: TypeAlias = Union[Decimal, int, None]
 
-TYPE_COUNTS_INPUT: TypeAlias = Sequence[Union[TYPE_COUNT_VALUE, float]]
-TYPE_COUNTS: TypeAlias = Sequence[TYPE_COUNT_VALUE]
-TYPE_MOVING_RANGES: TypeAlias = Sequence[TYPE_MOVING_RANGE_VALUE]
+CENTRAL_LINE_AVERAGE = 'average'
 
 
 class Base:
-    ROUNDING = 3
-
     def __init__(
             self,
             counts: TYPE_COUNTS_INPUT,
+            central_line: str = CENTRAL_LINE_AVERAGE,
             subset_start_index: int = 0,
             subset_end_index: Optional[int] = None,
     ):
@@ -43,6 +39,9 @@ class Base:
             self.j = min(self.j, subset_end_index)
 
         assert self.i <= self.j
+
+        if central_line == CENTRAL_LINE_AVERAGE:
+            self._cl = cl.Average(self.counts, self.i, self.j)
 
     def __repr__(self) -> str:
         result = ''
@@ -122,24 +121,25 @@ class Base:
         return self._mr
 
     def x_central_line(self) -> Sequence[Decimal]:
-        avg = self.mean(self.counts[self.i:self.j])
-        return [self.round(avg)] * len(self.counts)
+        return self._cl.x()
 
     def mr_central_line(self) -> Sequence[Decimal]:
         mr = self.moving_ranges()
         assert mr[0] is None
         valid_values = cast(TYPE_COUNTS, mr[self.i+1:self.j])
         avg = self.mean(valid_values)
-        return [self.round(avg)] * len(mr)
+        return [round(avg, ROUNDING)] * len(mr)
 
     def upper_range_limit(self) -> Sequence[Decimal]:
         mr_cl = self.mr_central_line()
         limit = Decimal('3.268') * mr_cl[0]
-        return [self.round(limit)] * len(mr_cl)
+        value = round(limit, ROUNDING)
+        return [value] * len(mr_cl)
 
     def upper_natural_process_limit(self) -> Sequence[Decimal]:
         limit = self.x_central_line()[0] + (Decimal('2.660') * self.mr_central_line()[0])
-        return [self.round(limit)] * len(self.counts)
+        value = round(limit, ROUNDING)
+        return [value] * len(self.counts)
 
     def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
@@ -147,7 +147,8 @@ class Base:
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
         limit = self.x_central_line()[0] - (Decimal('2.660') * self.mr_central_line()[0])
-        return [self.round(limit)] * len(self.counts)
+        value = round(limit, ROUNDING)
+        return [value] * len(self.counts)
 
     def rule_1_x_indices_beyond_limits(
             self,
@@ -266,9 +267,6 @@ class Base:
                         result[j] = True
 
         return result
-
-    def round(self, value: Decimal) -> Decimal:
-        return round(value, self.ROUNDING)
 
     @staticmethod
     def _points_beyond_limits(

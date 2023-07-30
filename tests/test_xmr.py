@@ -82,12 +82,9 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts[2] = 100
         counts[3] = 50
 
-        xmr = XmR(counts, subset_end_index=24)
-        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('30.442'))
-        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('28.134'))
-
-        # Adjust manually so that all subset values should be 1
-        xmr.i = 4
+        xmr = XmR(counts, subset_start_index=4, subset_end_index=24)
+        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('1.000'))
+        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('0'))
         self._assert_line_equals(xmr, 'x_central_line', 1)
         self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
 
