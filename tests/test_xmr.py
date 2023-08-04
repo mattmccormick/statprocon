@@ -297,6 +297,30 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertTrue(cl[14] < 725.2 < cl[15])
         self.assertNotIn(INVALID, cl)
         self._assert_cl_deltas_equals_slope(xmr)
+        # 93.5 in the book
+        self._assert_limits_beyond_cl(xmr, Decimal('93.520'))
+
+    def test_trended_limits_odd_halves(self):
+        counts = [
+            2.27, 2.55, 2.88, 2.27, 2.93, 3.08, 3.01,
+            3.12, 3.31, 3.05, 3.54, 3.45, 3.16, 3.58,
+        ]
+
+        xmr = XmR(counts, limit_type='trending')
+        s = xmr.slope()
+
+        self.assertEqual(s, Decimal('0.08612244897959183673469387757'))
+
+        cl = xmr.x_central_line()
+        self.assertNotIn(INVALID, cl)
+        self._assert_cl_deltas_equals_slope(xmr)
+
+    def test_negative_trended_limits(self):
+        self.skipTest('to do')
+
+    def _assert_line_equals(self, xmr, func, value):
+        actual = getattr(xmr, func)()
+        self.assertListEqual(actual, [value] * len(xmr.counts))
 
     def _assert_cl_deltas_equals_slope(self, xmr):
         cl = xmr.x_central_line()
@@ -307,29 +331,10 @@ mr_cl    : [1.000, 1.000, 1.000]
 
             self.assertEqual(cl[i], cl[i - 1] + s)
 
-    # def test_trended_limits_odd_halves(self):
-    #     counts = [
-    #         2.27, 2.55, 2.88, 2.27, 2.93, 3.08, 3.01,
-    #         3.12, 3.31, 3.05, 3.54, 3.45, 3.16, 3.58,
-    #     ]
-    #
-    #     xmr = XmRTrending(counts)
-    #     s = xmr.slope()
-    #
-    #     self.assertEqual(s, Decimal('0.08612244897959183673469387757'))
-    #
-    #     cl = xmr.x_central_line()
-    #     self.assertNotIn(INVALID, cl)
-    #
-    #     for i, v in enumerate(cl):
-    #         if i == 0:
-    #             continue
-    #
-    #         self.assertEqual(cl[i], cl[i-1] + s)
-
-    def test_negative_trended_limits(self):
-        self.skipTest('to do')
-
-    def _assert_line_equals(self, xmr, func, value):
-        actual = getattr(xmr, func)()
-        self.assertListEqual(actual, [value] * len(xmr.counts))
+    def _assert_limits_beyond_cl(self, xmr, delta):
+        unpl = xmr.upper_natural_process_limit()
+        cl = xmr.x_central_line()
+        lnpl = xmr.lower_natural_process_limit()
+        for u, c, l in zip(unpl, cl, lnpl):
+            self.assertEqual(u - c, delta)
+            self.assertEqual(c - l, delta)

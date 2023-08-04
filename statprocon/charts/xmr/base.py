@@ -225,20 +225,46 @@ class Base:
         return [value] * len(mr_cl)
 
     def upper_natural_process_limit(self) -> Sequence[Decimal]:
+        if self._limit_type == LIMITS_CONSTANT:
+            return self._upper_natural_process_limit_constant()
+        elif self._limit_type == LIMITS_TRENDING:
+            return self._upper_natural_process_limit_trending()
+
+    def _upper_natural_process_limit_constant(self) -> Sequence[Decimal]:
         sf = SF_LIMITS[self._moving_range_uses]
-        limit = self.x_central_line()[0] + (sf * self.mr_central_line()[0])
+        limit = self._x_central_line_constant()[0] + (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
+
+    def _upper_natural_process_limit_trending(self) -> Sequence[Decimal]:
+        unpl_constant = self._upper_natural_process_limit_constant()
+        x_cl_bar = self._x_central_line_constant()
+        delta = unpl_constant[0] - x_cl_bar[0]
+        result = [x + delta for x in self._x_central_line_trending()]
+        return result
 
     def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
         LNPL can be negative.
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
+        if self._limit_type == LIMITS_CONSTANT:
+            return self._lower_natural_process_limit_constant()
+        elif self._limit_type == LIMITS_TRENDING:
+            return self._lower_natural_process_limit_trending()
+
+    def _lower_natural_process_limit_constant(self) -> Sequence[Decimal]:
         sf = SF_LIMITS[self._moving_range_uses]
-        limit = self.x_central_line()[0] - (sf * self.mr_central_line()[0])
+        limit = self._x_central_line_constant()[0] - (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
+
+    def _lower_natural_process_limit_trending(self) -> Sequence[Decimal]:
+        lnpl_constant = self._lower_natural_process_limit_constant()
+        x_cl_bar = self._x_central_line_constant()
+        delta = x_cl_bar[0] - lnpl_constant[0]
+        result = [x - delta for x in self._x_central_line_trending()]
+        return result
 
     def slope(self) -> Decimal:
         """
