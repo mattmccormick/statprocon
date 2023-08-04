@@ -316,7 +316,15 @@ mr_cl    : [1.000, 1.000, 1.000]
         self._assert_cl_deltas_equals_slope(xmr)
 
     def test_negative_trended_limits(self):
-        self.skipTest('to do')
+        # Region B
+        counts = [
+            1412, 1280, 1129, 1181, 1149, 1248, 1103, 1021, 1085, 1125,
+            910, 999, 883, 851, 997, 878, 939, 834, 688, 806,
+        ]
+
+        xmr = XmR(counts, limit_type='trending')
+        self.assertEqual(xmr.slope(), Decimal('-29.48'))
+        self._assert_limits_beyond_cl(xmr, Decimal('272.161'))  # 272.2 in book
 
     def _assert_line_equals(self, xmr, func, value):
         actual = getattr(xmr, func)()
