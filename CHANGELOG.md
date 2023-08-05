@@ -2,6 +2,10 @@
 
 ---
 
+## 0.2.0
+
+- Add `XmRTrending()` class to compute trending X central line and natural process limits
+
 ## 0.1.1
 
 - Add parameter `x_central_line_uses` to accept `median` and return the median for the X central line
