@@ -103,6 +103,9 @@ trending = XmRTrending(source)
 pd.DataFrame(trending.x_to_dict()).astype(float).plot()
 ```
 
+![trending-limits](https://github.com/mattmccormick/statprocon/assets/436801/d0d9897e-b1b7-469b-9642-fbee8f39b104)
+
+
 ### Use the Median Moving Range
 
 If your data contains extreme outliers, it may be better to compute the limits using the median moving range.
