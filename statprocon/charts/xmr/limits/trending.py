@@ -1,16 +1,19 @@
 from decimal import Decimal
-from typing import Sequence
+from typing import Sequence, TYPE_CHECKING
 
-from statprocon import XmR  # TODO: type checking without import
+from statprocon import XmR
 from statprocon.charts.xmr.constants import INVALID
-from statprocon.charts.xmr.types import TYPE_COUNTS
-
-from .base import Base
 
 
-class Trending(Base):
+class Trending(XmR):
     def __init__(self, xmr: XmR):
         self.xmr = xmr
+
+    def __getattr__(self, item):
+        """
+        Delegate all other attributes to self.xmr
+        """
+        return getattr(self.xmr, item)
 
     def x_central_line(self) -> Sequence[Decimal]:
         n = len(self.xmr.counts)

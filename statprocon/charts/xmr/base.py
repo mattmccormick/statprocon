@@ -56,7 +56,6 @@ class Base:
         assert moving_range_uses in [AVERAGE, MEDIAN]
 
         self.counts = cast(TYPE_COUNTS, self.to_decimal_list(counts))
-        self._mr: TYPE_MOVING_RANGES = []
         self.i = max(0, subset_start_index)
         self.j = len(counts)
         if subset_end_index:
@@ -134,9 +133,6 @@ class Base:
         Moving ranges are the absolute differences between successive count values.
         The first element will always be None
         """
-        if self._mr:
-            return self._mr
-
         result: list[TYPE_MOVING_RANGE_VALUE] = []
         for i, c in enumerate(self.counts):
             if i == 0:
@@ -144,8 +140,7 @@ class Base:
             else:
                 value = cast(Union[Decimal, int], abs(c - self.counts[i - 1]))
                 result.append(value)
-        self._mr = result
-        return self._mr
+        return result
 
     def x_central_line(self) -> Sequence[Decimal]:
         valid_values = self.counts[self.i:self.j]
