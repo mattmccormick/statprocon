@@ -18,11 +18,6 @@ from .types import (
 AVERAGE = 'average'
 MEDIAN = 'median'
 
-INVALID = Decimal('NaN')
-
-LIMITS_CONSTANT = 'constant'
-LIMITS_TRENDING = 'trending'
-
 # Scaling Factors (SF)
 SF_LIMITS = {
     AVERAGE: Decimal('2.660'),
@@ -41,7 +36,6 @@ class Base:
             counts: TYPE_COUNTS_INPUT,
             x_central_line_uses: str = AVERAGE,
             moving_range_uses: str = AVERAGE,
-            limit_type: str = LIMITS_CONSTANT,
             subset_start_index: int = 0,
             subset_end_index: Optional[int] = None,
     ):
@@ -53,10 +47,10 @@ class Base:
             set to median.
         :param moving_range_uses: Whether to use the 'average' or 'median' moving range.
             Defaults to average.
-        :param limit_type: 'constant' or 'trending'.  If trending is specified, the X central line
-            and limits will be calculated based on the slope of the trendline.  Defaults to constant
-        :param subset_start_index: Optional starting index of counts to calculate limits from
-        :param subset_end_index: Optional ending index of counts to calculate limits to
+        :param subset_start_index: Optional starting index of counts to calculate limits from.
+            Defaults to 0
+        :param subset_end_index: Optional ending index + 1 of counts to calculate limits to.
+            Defaults to len(n)
         """
         assert x_central_line_uses in [AVERAGE, MEDIAN]
         assert moving_range_uses in [AVERAGE, MEDIAN]
@@ -75,8 +69,6 @@ class Base:
             self._moving_range_uses = MEDIAN
         else:
             self._moving_range_uses = moving_range_uses
-
-        self._limit_type = limit_type
 
     def __repr__(self) -> str:
         result = ''
@@ -156,12 +148,6 @@ class Base:
         return self._mr
 
     def x_central_line(self) -> Sequence[Decimal]:
-        if self._limit_type == LIMITS_CONSTANT:
-            return self._x_central_line_constant()
-        elif self._limit_type == LIMITS_TRENDING:
-            return self._x_central_line_trending()
-
-    def _x_central_line_constant(self) -> Sequence[Decimal]:
         valid_values = self.counts[self.i:self.j]
         if self._x_central_line_uses == AVERAGE:
             value = self._mean(valid_values)
@@ -169,34 +155,6 @@ class Base:
             value = statistics.median(valid_values)  # type: ignore[type-var,assignment]
 
         return [round(value, ROUNDING)] * len(self.counts)
-
-    def _x_central_line_trending(self) -> TYPE_COUNTS:
-        n = len(self.counts)
-
-        result: list[Decimal] = [INVALID] * n
-        m = self._half_n()
-        h = m // 2
-        s = self.slope()
-
-        is_odd = m % 2
-        if is_odd:
-            # ie. if m == 9, then insert ha1 at position 4
-            # 0 1 2 3 |4| 5 6 7 8 9
-            result[h] = self._half_average1()
-        else:
-            # ie. if m == 10, then insert ha1 at position 5 but calculate the value
-            # based on half the slope
-            # since the mid point is halfway between 4 and 5
-            # 0 1 2 3 4 | 5 6 7 8 9
-            result[h] = self._half_average1() + Decimal('0.5') * s
-
-        for i in reversed(range(0, h)):
-            result[i] = result[i+1] - s
-
-        for i in range(h+1, n):
-            result[i] = result[i-1] + s
-
-        return result
 
     def mr_central_line(self) -> Sequence[Decimal]:
         mr = self.moving_ranges()
@@ -225,68 +183,20 @@ class Base:
         return [value] * len(mr_cl)
 
     def upper_natural_process_limit(self) -> Sequence[Decimal]:
-        if self._limit_type == LIMITS_CONSTANT:
-            return self._upper_natural_process_limit_constant()
-        elif self._limit_type == LIMITS_TRENDING:
-            return self._upper_natural_process_limit_trending()
-
-    def _upper_natural_process_limit_constant(self) -> Sequence[Decimal]:
         sf = SF_LIMITS[self._moving_range_uses]
-        limit = self._x_central_line_constant()[0] + (sf * self.mr_central_line()[0])
+        limit = self.x_central_line()[0] + (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
-
-    def _upper_natural_process_limit_trending(self) -> Sequence[Decimal]:
-        unpl_constant = self._upper_natural_process_limit_constant()
-        x_cl_bar = self._x_central_line_constant()
-        delta = unpl_constant[0] - x_cl_bar[0]
-        result = [x + delta for x in self._x_central_line_trending()]
-        return result
 
     def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
         LNPL can be negative.
         It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
         """
-        if self._limit_type == LIMITS_CONSTANT:
-            return self._lower_natural_process_limit_constant()
-        elif self._limit_type == LIMITS_TRENDING:
-            return self._lower_natural_process_limit_trending()
-
-    def _lower_natural_process_limit_constant(self) -> Sequence[Decimal]:
         sf = SF_LIMITS[self._moving_range_uses]
-        limit = self._x_central_line_constant()[0] - (sf * self.mr_central_line()[0])
+        limit = self.x_central_line()[0] - (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
-
-    def _lower_natural_process_limit_trending(self) -> Sequence[Decimal]:
-        lnpl_constant = self._lower_natural_process_limit_constant()
-        x_cl_bar = self._x_central_line_constant()
-        delta = x_cl_bar[0] - lnpl_constant[0]
-        result = [x - delta for x in self._x_central_line_trending()]
-        return result
-
-    def slope(self) -> Decimal:
-        """
-        Returns the trend or slope of the limit and central lines
-        """
-
-        if self._limit_type == LIMITS_CONSTANT:
-            return Decimal('0')
-
-        n = len(self.counts) // 2
-        nd = Decimal(str(n))
-
-        half_average2 = sum(self.counts[-n:]) / nd
-
-        return (half_average2 - self._half_average1()) / nd
-
-    def _half_average1(self) -> Decimal:
-        n = self._half_n()
-        return sum(self.counts[0:n]) / Decimal(str(n))
-
-    def _half_n(self) -> int:
-        return len(self.counts) // 2
 
     def rule_1_x_indices_beyond_limits(
             self,

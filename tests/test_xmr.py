@@ -3,7 +3,6 @@ import unittest
 from decimal import Decimal
 
 from statprocon import XmR
-from statprocon.charts.xmr.base import INVALID
 
 
 class XmRTestCase(unittest.TestCase):
@@ -277,72 +276,6 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(unpl, xmr.upper_natural_process_limit()[0])
         self.assertEqual(url, xmr.upper_range_limit()[0])
 
-    def test_trended_limits(self):
-        # This data comes from pg. 179 of Making Sense of Data
-        #     12.3 Charts for Each Region - Region D
-
-        counts = [
-            539, 558, 591, 556, 540, 590, 606, 643, 657, 602,
-            596, 640, 691, 723, 701, 802, 749, 762, 807, 781,
-        ]
-
-        xmr = XmR(counts, limit_type='trending')
-        s = xmr.slope()
-
-        self.assertEqual(s, Decimal('13.7'))
-
-        # Don't know exact values from the book
-        cl = xmr.x_central_line()
-        self.assertTrue(cl[4] < 588.2 < cl[5])
-        self.assertTrue(cl[14] < 725.2 < cl[15])
-        self.assertNotIn(INVALID, cl)
-        self._assert_cl_deltas_equals_slope(xmr)
-        # 93.5 in the book
-        self._assert_limits_beyond_cl(xmr, Decimal('93.520'))
-
-    def test_trended_limits_odd_halves(self):
-        counts = [
-            2.27, 2.55, 2.88, 2.27, 2.93, 3.08, 3.01,
-            3.12, 3.31, 3.05, 3.54, 3.45, 3.16, 3.58,
-        ]
-
-        xmr = XmR(counts, limit_type='trending')
-        s = xmr.slope()
-
-        self.assertEqual(s, Decimal('0.08612244897959183673469387757'))
-
-        cl = xmr.x_central_line()
-        self.assertNotIn(INVALID, cl)
-        self._assert_cl_deltas_equals_slope(xmr)
-
-    def test_negative_trended_limits(self):
-        # Region B
-        counts = [
-            1412, 1280, 1129, 1181, 1149, 1248, 1103, 1021, 1085, 1125,
-            910, 999, 883, 851, 997, 878, 939, 834, 688, 806,
-        ]
-
-        xmr = XmR(counts, limit_type='trending')
-        self.assertEqual(xmr.slope(), Decimal('-29.48'))
-        self._assert_limits_beyond_cl(xmr, Decimal('272.161'))  # 272.2 in book
-
     def _assert_line_equals(self, xmr, func, value):
         actual = getattr(xmr, func)()
         self.assertListEqual(actual, [value] * len(xmr.counts))
-
-    def _assert_cl_deltas_equals_slope(self, xmr):
-        cl = xmr.x_central_line()
-        s = xmr.slope()
-        for i, v in enumerate(cl):
-            if i == 0:
-                continue
-
-            self.assertEqual(cl[i], cl[i - 1] + s)
-
-    def _assert_limits_beyond_cl(self, xmr, delta):
-        unpl = xmr.upper_natural_process_limit()
-        cl = xmr.x_central_line()
-        lnpl = xmr.lower_natural_process_limit()
-        for u, c, l in zip(unpl, cl, lnpl):
-            self.assertEqual(u - c, delta)
-            self.assertEqual(c - l, delta)
