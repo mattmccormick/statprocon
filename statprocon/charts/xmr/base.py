@@ -5,7 +5,7 @@ import statistics
 from decimal import Decimal
 from typing import cast, List, Optional, Sequence, Union
 
-from .constants import ROUNDING
+from .constants import INVALID, ROUNDING
 from .types import (
     TYPE_COUNTS,
     TYPE_COUNTS_INPUT,
@@ -291,14 +291,11 @@ class Base:
         # negative value is point near lower limit
         near_limits = [0] * len(self.counts)
 
-        values = zip(self.counts, self.upper_natural_process_limit(), self.lower_natural_process_limit())
-        for i, (x, unpl, lnpl) in enumerate(values):
-            upper_25 = ((unpl - lnpl) * Decimal('.75')) + lnpl
-            lower_25 = ((unpl - lnpl) * Decimal('.25')) + lnpl
+        values = zip(self.counts, self.upper_halfway_line(), self.lower_halfway_line())
+        for i, (x, upper_25, lower_25) in enumerate(values):
             if x < lower_25:
                 near_limits[i] = -1
-
-            if x > upper_25:
+            elif x > upper_25:
                 near_limits[i] = 1
 
             if i >= 3:
@@ -307,6 +304,20 @@ class Base:
                     for j in range(i - 3, i + 1):
                         result[j] = True
 
+        return result
+
+    def upper_halfway_line(self) -> Sequence[Decimal]:
+        result = [INVALID] * len(self.counts)
+        values = zip(self.x_central_line(), self.upper_natural_process_limit())
+        for i, (x, y) in enumerate(values):
+            result[i] = (y - x) * Decimal('0.5') + x
+        return result
+
+    def lower_halfway_line(self) -> Sequence[Decimal]:
+        result = [INVALID] * len(self.counts)
+        values = zip(self.lower_natural_process_limit(), self.x_central_line())
+        for i, (w, x) in enumerate(values):
+            result[i] = (x - w) * Decimal('0.5') - x
         return result
 
     @staticmethod
