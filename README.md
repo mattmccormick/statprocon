@@ -89,6 +89,20 @@ The LNPL line will be removed from the X Chart.
 
 ## Advanced Usage
 
+### Trending Limits
+
+With data points that trend upwards or downwards over time, use Trending Limits to calculate a sloping X central line, upper natural process limits and lower natural process limits.
+
+```python
+from statprocon import XmRTrending
+
+counts = [...]  # data from TrendingTestCase.test_trending_limits
+
+source = XmR(counts)
+trending = XmRTrending(source)
+pd.DataFrame(trending.x_to_dict()).astype(float).plot()
+```
+
 ### Use the Median Moving Range
 
 If your data contains extreme outliers, it may be better to compute the limits using the median moving range.
