@@ -2,6 +2,10 @@
 
 ---
 
+## 0.3.0
+
+- Add optional `include_halfway_lines` parameter to `to_dict()` and `x_to_dict()` to return halfway lines that should capture 85% of X values in predictable processes  
+
 ## 0.2.0
 
 - Add `XmRTrending()` class to compute trending X central line and natural process limits

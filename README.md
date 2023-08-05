@@ -55,6 +55,14 @@ pd.DataFrame(xmr.mr_to_dict()).astype(float).plot()
 
 ![Screenshot from 2023-07-22 13-53-22](https://github.com/mattmccormick/statprocon/assets/436801/b6a83903-4bb9-4935-9acb-c086d3420fd2)
 
+Halfway lines between the X central line and the Upper and Lower Natural Process Limits can be returned by using the `include_halfway_lines` argument:
+
+```python
+xmr.x_to_dict(include_halfway_lines=True)
+```
+
+When the process is predictable, approximately 85% of the X values fall between the Upper and Lower halfway lines.
+
 
 ### CSV
 
@@ -91,7 +99,7 @@ The LNPL line will be removed from the X Chart.
 
 ### Trending Limits
 
-With data points that trend upwards or downwards over time, use Trending Limits to calculate a sloping X central line, upper natural process limits and lower natural process limits.
+With data points that trend upwards or downwards over time, use Trending Limits to calculate a sloping X central line, Upper Natural Process Limits and Lower Natural Process Limits.
 
 ```python
 from statprocon import XmRTrending
