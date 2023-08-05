@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Sequence, TYPE_CHECKING
+from typing import Sequence
 
 from statprocon import XmR
 from statprocon.charts.xmr.constants import INVALID
@@ -7,7 +7,17 @@ from statprocon.charts.xmr.constants import INVALID
 
 class Trending(XmR):
     def __init__(self, xmr: XmR):
+        """
+        This class will compute limits that trend upwards or downwards over time based on the slope
+        of the average of the two halves of count data.
+        When you have XmR charts that trend upwards or downwards over time, it's better to use
+        trended limits for use with detection rules and forecasting.
+
+        :param xmr: The constant limits XmR chart to use as a basis for computing trending limits
+        """
         self.xmr = xmr
+        self.i = self.xmr.i
+        self.j = self.xmr.j
 
     def __getattr__(self, item):
         """
@@ -20,7 +30,7 @@ class Trending(XmR):
 
         result: list[Decimal] = [INVALID] * n
         m = self._half_n()
-        h = (m + self.xmr.i) // 2
+        h = (m + self.i) // 2
         s = self.slope()
 
         is_odd = m % 2
@@ -62,16 +72,16 @@ class Trending(XmR):
         Returns the trend or slope of the limit and central lines
         """
 
-        n = len(self.xmr.counts[self.xmr.i:self.xmr.j]) // 2
+        n = len(self.xmr.counts[self.i:self.j]) // 2
         nd = Decimal(str(n))
 
-        half_average2 = sum(self.xmr.counts[(self.xmr.j-n):self.xmr.j]) / nd
+        half_average2 = sum(self.xmr.counts[(self.j-n):self.j]) / nd
 
         return (half_average2 - self._half_average1()) / nd
 
     def _half_n(self) -> int:
-        return len(self.xmr.counts[self.xmr.i:self.xmr.j]) // 2
+        return len(self.xmr.counts[self.i:self.j]) // 2
 
     def _half_average1(self) -> Decimal:
         n = self._half_n()
-        return sum(self.xmr.counts[self.xmr.i:n]) / Decimal(str(n))
+        return sum(self.xmr.counts[self.i:n]) / Decimal(str(n))
