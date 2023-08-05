@@ -80,16 +80,24 @@ class Base:
             result += f'{k_format}: {values}\n'
         return result
 
-    def x_to_dict(self) -> dict:
+    def x_to_dict(self, include_halfway_lines=False) -> dict:
         """
         Return the values needed for the X chart as a dictionary
         """
-        return {
+        result = {
             'values': self.counts,
             'unpl': self.upper_natural_process_limit(),
+            'unpl_mid': self.upper_halfway_line(),
             'cl': self.x_central_line(),
+            'lnpl_mid': self.lower_halfway_line(),
             'lnpl': self.lower_natural_process_limit(),
         }
+
+        if not include_halfway_lines:
+            del result['unpl_mid']
+            del result['lnpl_mid']
+
+        return result
 
     def mr_to_dict(self) -> dict:
         """
@@ -101,11 +109,17 @@ class Base:
             'cl': self.mr_central_line(),
         }
 
-    def to_dict(self) -> dict:
+    def to_dict(self, include_halfway_lines=False) -> dict:
         # Naming comes from pg. 163
         #   So Which Way Should You Compute Limits? from Making Sense of Data
+        """
+
+        :param include_halfway_lines: If set to True, 'x_unpl_mid' and 'x_lnpl_mid' will be included
+            in the result representing the halfway points between the UNPL and X central line and
+            X central line and LNPL.
+        """
         result = {}
-        for k, v in self.x_to_dict().items():
+        for k, v in self.x_to_dict(include_halfway_lines=include_halfway_lines).items():
             result[f'x_{k}'] = v
         for k, v in self.mr_to_dict().items():
             result[f'mr_{k}'] = v
@@ -182,6 +196,32 @@ class Base:
         limit = self.x_central_line()[0] + (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
+
+    def upper_halfway_line(self) -> Sequence[Decimal]:
+        """
+        The halfway line between the Upper Natural Process Limit and the central line.
+        With a predictable process, approximately 85% of the X values should fall within the halfway
+        lines.
+        """
+        result = [INVALID] * len(self.counts)
+        values = zip(self.x_central_line(), self.upper_natural_process_limit())
+        for i, (x, y) in enumerate(values):
+            mid = (y - x) * Decimal('0.5') + x
+            result[i] = round(mid, ROUNDING)
+        return result
+
+    def lower_halfway_line(self) -> Sequence[Decimal]:
+        """
+        The halfway line between the central line and the Lower Natural Process Limit.
+        With a predictable process, approximately 85% of the X values should fall within the halfway
+        lines.
+        """
+        result = [INVALID] * len(self.counts)
+        values = zip(self.lower_natural_process_limit(), self.x_central_line())
+        for i, (w, x) in enumerate(values):
+            mid = (x - w) * Decimal('0.5') + w
+            result[i] = round(mid, ROUNDING)
+        return result
 
     def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
@@ -304,20 +344,6 @@ class Base:
                     for j in range(i - 3, i + 1):
                         result[j] = True
 
-        return result
-
-    def upper_halfway_line(self) -> Sequence[Decimal]:
-        result = [INVALID] * len(self.counts)
-        values = zip(self.x_central_line(), self.upper_natural_process_limit())
-        for i, (x, y) in enumerate(values):
-            result[i] = (y - x) * Decimal('0.5') + x
-        return result
-
-    def lower_halfway_line(self) -> Sequence[Decimal]:
-        result = [INVALID] * len(self.counts)
-        values = zip(self.lower_natural_process_limit(), self.x_central_line())
-        for i, (w, x) in enumerate(values):
-            result[i] = (x - w) * Decimal('0.5') - x
         return result
 
     @staticmethod

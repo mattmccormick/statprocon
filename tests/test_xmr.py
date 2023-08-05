@@ -3,6 +3,7 @@ import unittest
 from decimal import Decimal
 
 from statprocon import XmR
+from statprocon.charts.xmr.types import TYPE_COUNT_VALUE
 
 
 class XmRTestCase(unittest.TestCase):
@@ -37,10 +38,18 @@ mr_cl    : [1.000, 1.000, 1.000]
 """
         self.assertEqual(xmr.to_csv(), expected)
 
+    def test_to_dict_includes_halfway_lines(self):
+        counts = [3, 4, 5]
+        xmr = XmR(counts)
+
+        d = xmr.to_dict(include_halfway_lines=True)
+        self._assert_line_equals(d['x_unpl_mid'], Decimal('5.33'))
+        self._assert_line_equals(d['x_lnpl_mid'], Decimal('2.67'))
+
     def test_average_contains_one_more_exponent_as_input(self):
         counts = [3, 3, 4]
         xmr = XmR(counts)
-        self._assert_line_equals(xmr, 'x_central_line', Decimal('3.333'))
+        self._assert_func_output_equals_line(xmr, 'x_central_line', Decimal('3.333'))
 
     def test_moving_range_ints(self):
         counts = [1, 10, 100, 50]
@@ -64,17 +73,17 @@ mr_cl    : [1.000, 1.000, 1.000]
     def test_upper_range_limit(self):
         counts = [1,51, 100, 50]
         xmr = XmR(counts)
-        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('162.312'))
+        self._assert_func_output_equals_line(xmr, 'upper_range_limit', Decimal('162.312'))
 
     def test_upper_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
-        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('172.364'))
+        self._assert_func_output_equals_line(xmr, 'upper_natural_process_limit', Decimal('172.364'))
 
     def test_lower_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
-        self._assert_line_equals(xmr, 'lower_natural_process_limit', Decimal('-91.864'))
+        self._assert_func_output_equals_line(xmr, 'lower_natural_process_limit', Decimal('-91.864'))
 
     def test_limits_with_subsets(self):
         counts = [1] * 25
@@ -83,9 +92,9 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts[3] = 50
 
         xmr = XmR(counts, subset_start_index=4, subset_end_index=24)
-        self._assert_line_equals(xmr, 'upper_natural_process_limit', Decimal('1.000'))
-        self._assert_line_equals(xmr, 'upper_range_limit', Decimal('0'))
-        self._assert_line_equals(xmr, 'x_central_line', 1)
+        self._assert_func_output_equals_line(xmr, 'upper_natural_process_limit', Decimal('1.000'))
+        self._assert_func_output_equals_line(xmr, 'upper_range_limit', Decimal('0'))
+        self._assert_func_output_equals_line(xmr, 'x_central_line', 1)
         self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
 
     def test_rule_1_points_beyond_upper_limits(self):
@@ -276,6 +285,9 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(unpl, xmr.upper_natural_process_limit()[0])
         self.assertEqual(url, xmr.upper_range_limit()[0])
 
-    def _assert_line_equals(self, xmr, func, value):
+    def _assert_func_output_equals_line(self, xmr: XmR, func: str, value: TYPE_COUNT_VALUE):
         actual = getattr(xmr, func)()
-        self.assertListEqual(actual, [value] * len(xmr.counts))
+        self._assert_line_equals(actual, value)
+
+    def _assert_line_equals(self, actual: list, expected_value: TYPE_COUNT_VALUE):
+        self.assertListEqual(actual, [expected_value] * len(actual))
