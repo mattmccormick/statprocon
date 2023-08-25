@@ -80,10 +80,11 @@ mr_cl    : [1.000, 1.000, 1.000]
         xmr = XmR(counts)
         self._assert_func_output_equals_line(xmr, 'upper_natural_process_limit', Decimal('172.364'))
 
-    def test_lower_natural_process_limit(self):
+    def test_lower_natural_process_floor(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
-        self._assert_func_output_equals_line(xmr, 'lower_natural_process_limit', Decimal('-91.864'))
+        result = xmr.lower_natural_process_limit(floor=0)
+        self._assert_line_equals(result, 0)
 
     def test_limits_with_subsets(self):
         counts = [1] * 25

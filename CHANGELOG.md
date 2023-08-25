@@ -2,6 +2,10 @@
 
 ---
 
+## 0.4.0
+
+- Add optional `floor` parameter to `lower_natural_process_limit()` to allow specifying a value that LNPL cannot be more negative than
+
 ## 0.3.0
 
 - Add optional `include_halfway_lines` parameter to `to_dict()` and `x_to_dict()` to return halfway lines that should capture 85% of X values in predictable processes  

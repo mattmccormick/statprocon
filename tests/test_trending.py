@@ -81,6 +81,14 @@ class TrendingTestCase(unittest.TestCase):
         expected[17] = True
         self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(), expected)
 
+    def test_lower_natural_process_limit_floor(self):
+        counts = [0, 1, 2, 3, 4]
+
+        c = XmR(counts)
+        xmr = XmRTrending(c)
+        for val in xmr.lower_natural_process_limit(floor=0):
+            self.assertGreaterEqual(val, 0)
+
     def _assert_cl_deltas_equals_slope(self, xmr):
         cl = xmr.x_central_line()
         s = xmr.slope()

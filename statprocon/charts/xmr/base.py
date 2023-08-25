@@ -223,14 +223,14 @@ class Base:
             result[i] = round(mid, ROUNDING)
         return result
 
-    def lower_natural_process_limit(self) -> Sequence[Decimal]:
+    def lower_natural_process_limit(self, floor: Union[Decimal, int, float] = Decimal('-Infinity')) -> Sequence[Decimal]:
         """
-        LNPL can be negative.
-        It's the caller's responsibility to take max(LNPL, 0) if a negative LNPL does not make sense
+        :param floor: If specified, the result will be max(floor, lnpl).
+            This is useful for situations where LNPL cannot physically be lower than a certain value ie. 0
         """
         sf = SF_LIMITS[self._moving_range_uses]
         limit = self.x_central_line()[0] - (sf * self.mr_central_line()[0])
-        value = round(limit, ROUNDING)
+        value = max(round(limit, ROUNDING), Decimal(str(floor)))
         return [value] * len(self.counts)
 
     def rule_1_x_indices_beyond_limits(

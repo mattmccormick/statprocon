@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Sequence
+from typing import Sequence, Union
 
 from statprocon import XmR
 from statprocon.charts.xmr.constants import INVALID
@@ -60,11 +60,11 @@ class Trending(XmR):
         result = [x + delta for x in self.x_central_line()]
         return result
     
-    def lower_natural_process_limit(self) -> Sequence[Decimal]:
+    def lower_natural_process_limit(self, floor: Union[Decimal, int, float] = Decimal('-Infinity')) -> Sequence[Decimal]:
         lnpl0 = self.xmr.lower_natural_process_limit()
         x_cl0 = self.xmr.x_central_line()
         delta = x_cl0[0] - lnpl0[0]
-        result = [x - delta for x in self.x_central_line()]
+        result = [max(x - delta, Decimal(str(floor))) for x in self.x_central_line()]
         return result
     
     def slope(self) -> Decimal:
