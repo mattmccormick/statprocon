@@ -2,6 +2,10 @@
 
 ---
 
+## 0.5.0
+
+- Add optional `moving_average_points` parameter to `to_dict()` and `x_to_dict()` to return moving average values for the number of points
+
 ## 0.4.0
 
 - Add optional `floor` parameter to `lower_natural_process_limit()` to allow specifying a value that LNPL cannot be more negative than

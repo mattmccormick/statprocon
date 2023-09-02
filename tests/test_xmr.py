@@ -46,6 +46,14 @@ mr_cl    : [1.000, 1.000, 1.000]
         self._assert_line_equals(d['x_unpl_mid'], Decimal('5.33'))
         self._assert_line_equals(d['x_lnpl_mid'], Decimal('2.67'))
 
+    def test_to_dict_moving_average(self):
+        counts = [1, 2, 3, 4, 5, 6, 7]
+        xmr = XmR(counts)
+
+        d = xmr.to_dict(moving_average_points=4)
+        expected = [None, None, None, 2.5, 3.5, 4.5, 5.5]
+        self.assertListEqual(d['x_moving_average'], expected)
+
     def test_average_contains_one_more_exponent_as_input(self):
         counts = [3, 3, 4]
         xmr = XmR(counts)

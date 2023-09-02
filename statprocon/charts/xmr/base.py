@@ -80,7 +80,11 @@ class Base:
             result += f'{k_format}: {values}\n'
         return result
 
-    def x_to_dict(self, include_halfway_lines=False) -> dict:
+    def x_to_dict(
+            self,
+            include_halfway_lines: bool = False,
+            moving_average_points: Optional[int] = None,
+    ) -> dict:
         """
         Return the values needed for the X chart as a dictionary
         """
@@ -97,6 +101,9 @@ class Base:
             del result['unpl_mid']
             del result['lnpl_mid']
 
+        if moving_average_points:
+            result['moving_average'] = self.moving_average(moving_average_points)  # type: ignore[assignment]
+
         return result
 
     def mr_to_dict(self) -> dict:
@@ -109,7 +116,11 @@ class Base:
             'cl': self.mr_central_line(),
         }
 
-    def to_dict(self, include_halfway_lines=False) -> dict:
+    def to_dict(
+            self,
+            include_halfway_lines: bool = False,
+            moving_average_points: Optional[int] = None,
+    ) -> dict:
         # Naming comes from pg. 163
         #   So Which Way Should You Compute Limits? from Making Sense of Data
         """
@@ -117,9 +128,15 @@ class Base:
         :param include_halfway_lines: If set to True, 'x_unpl_mid' and 'x_lnpl_mid' will be included
             in the result representing the halfway points between the UNPL and X central line and
             X central line and LNPL.
+        :param moving_average_points: If set, 'moving_average` will be included in the result and
+            will be computed based on the number of points.
         """
         result = {}
-        for k, v in self.x_to_dict(include_halfway_lines=include_halfway_lines).items():
+        x_dict = self.x_to_dict(
+            include_halfway_lines=include_halfway_lines,
+            moving_average_points=moving_average_points,
+        )
+        for k, v in x_dict.items():
             result[f'x_{k}'] = v
         for k, v in self.mr_to_dict().items():
             result[f'mr_{k}'] = v
@@ -343,6 +360,17 @@ class Base:
                 if abs(sum(successive_values)) >= 3:
                     for j in range(i - 3, i + 1):
                         result[j] = True
+
+        return result
+
+    def moving_average(self, n: int) -> Sequence[Union[None, Decimal]]:
+        assert n > 0
+
+        result: List[Union[None, Decimal]] = [None] * (n - 1)
+        nd = Decimal(n)
+        for i in range(n-1, len(self.counts)):
+            ma = sum(self.counts[i-n+1:i+1]) / nd
+            result.append(ma)
 
         return result
 
