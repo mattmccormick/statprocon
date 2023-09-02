@@ -102,7 +102,7 @@ class Base:
             del result['lnpl_mid']
 
         if moving_average_points:
-            result['moving_average'] = self.moving_average(moving_average_points)  # type: ignore[assignment]
+            result['moving_average'] = self.x_moving_average(moving_average_points)  # type: ignore[assignment]
 
         return result
 
@@ -181,6 +181,17 @@ class Base:
             value = statistics.median(valid_values)  # type: ignore[type-var,assignment]
 
         return [round(value, ROUNDING)] * len(self.counts)
+
+    def x_moving_average(self, n: int) -> Sequence[Union[None, Decimal]]:
+        assert n > 0
+
+        result: List[Union[None, Decimal]] = [None] * (n - 1)
+        nd = Decimal(n)
+        for i in range(n-1, len(self.counts)):
+            ma = sum(self.counts[i-n+1:i+1]) / nd
+            result.append(ma)
+
+        return result
 
     def mr_central_line(self) -> Sequence[Decimal]:
         mr = self.moving_ranges()
@@ -360,17 +371,6 @@ class Base:
                 if abs(sum(successive_values)) >= 3:
                     for j in range(i - 3, i + 1):
                         result[j] = True
-
-        return result
-
-    def moving_average(self, n: int) -> Sequence[Union[None, Decimal]]:
-        assert n > 0
-
-        result: List[Union[None, Decimal]] = [None] * (n - 1)
-        nd = Decimal(n)
-        for i in range(n-1, len(self.counts)):
-            ma = sum(self.counts[i-n+1:i+1]) / nd
-            result.append(ma)
 
         return result
 

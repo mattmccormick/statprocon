@@ -2,6 +2,10 @@
 
 ---
 
+## 0.5.1
+
+- Rename `moving_average()` to `x_moving_average()`
+
 ## 0.5.0
 
 - Add optional `moving_average_points` parameter to `to_dict()` and `x_to_dict()` to return moving average values for the number of points
