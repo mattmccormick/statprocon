@@ -11,6 +11,7 @@ from .types import (
     TYPE_COUNTS_INPUT,
     TYPE_MOVING_RANGE_VALUE,
     TYPE_MOVING_RANGES,
+    TYPE_NUMERIC,
     TYPE_NUMERIC_INPUTS,
 )
 
@@ -84,6 +85,7 @@ class Base:
             self,
             include_halfway_lines: bool = False,
             moving_average_points: Optional[int] = None,
+            lower_natural_process_limit_floor: TYPE_NUMERIC = Decimal('-Infinity'),
     ) -> dict:
         """
         Return the values needed for the X chart as a dictionary
@@ -94,8 +96,10 @@ class Base:
             'unpl_mid': self.upper_halfway_line(),
             'cl': self.x_central_line(),
             'lnpl_mid': self.lower_halfway_line(),
-            'lnpl': self.lower_natural_process_limit(),
         }
+
+        if self.is_lnpl_above_floor(lower_natural_process_limit_floor):
+            result['lnpl'] = self.lower_natural_process_limit()
 
         if not include_halfway_lines:
             del result['unpl_mid']
@@ -251,15 +255,19 @@ class Base:
             result[i] = round(mid, ROUNDING)
         return result
 
-    def lower_natural_process_limit(self, floor: Union[Decimal, int, float] = Decimal('-Infinity')) -> Sequence[Decimal]:
+    def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
         :param floor: If specified, the result will be max(floor, lnpl).
             This is useful for situations where LNPL cannot physically be lower than a certain value ie. 0
         """
         sf = SF_LIMITS[self._moving_range_uses]
         limit = self.x_central_line()[0] - (sf * self.mr_central_line()[0])
-        value = max(round(limit, ROUNDING), Decimal(str(floor)))
+        value = round(limit, ROUNDING)
         return [value] * len(self.counts)
+
+    def is_lnpl_above_floor(self, floor):
+        lnpl = self.lower_natural_process_limit()
+        return any(x > floor for x in lnpl)
 
     def rule_1_x_indices_beyond_limits(
             self,

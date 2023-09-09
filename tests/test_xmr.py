@@ -54,6 +54,16 @@ mr_cl    : [1.000, 1.000, 1.000]
         expected = [None, None, None, 2.5, 3.5, 4.5, 5.5]
         self.assertListEqual(d['x_moving_average'], expected)
 
+    def test_to_dict_lnpl_floor(self):
+        counts = [1, 2, 3, 4]
+        xmr = XmR(counts)
+
+        lnpl = xmr.lower_natural_process_limit()
+        self.assertLess(lnpl[0], 0)
+
+        d = xmr.x_to_dict(lower_natural_process_limit_floor=0)
+        self.assertNotIn('lnpl', d)
+
     def test_average_contains_one_more_exponent_as_input(self):
         counts = [3, 3, 4]
         xmr = XmR(counts)
@@ -87,12 +97,6 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
         self._assert_func_output_equals_line(xmr, 'upper_natural_process_limit', Decimal('172.364'))
-
-    def test_lower_natural_process_floor(self):
-        counts = [1, 10, 100, 50]
-        xmr = XmR(counts)
-        result = xmr.lower_natural_process_limit(floor=0)
-        self._assert_line_equals(result, 0)
 
     def test_limits_with_subsets(self):
         counts = [1] * 25
