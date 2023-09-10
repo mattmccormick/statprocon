@@ -1,6 +1,7 @@
 import csv
 import io
 import statistics
+import sys
 
 from decimal import Decimal
 from typing import cast, List, Optional, Sequence, Union
@@ -113,6 +114,69 @@ class Base:
             result['moving_average'] = self.x_moving_average(moving_average_points)  # type: ignore[assignment]
 
         return result
+
+    def x_plot(self, pd, index: Optional[list] = None):
+        """
+        Generates a matplotlib plot of the X chart with points marked that meet the detection rules.
+        Detection rules are prioritized such that Rule 1 data points will override Rule 2 data points
+        and Rule 2 will override Rule 3 data points.
+        Points that meet Rule 1 will be marked by a red circle.
+        Points that meet Rule 2 will be marked by a green circle.
+        Points that meet Rule 3 will be marked by an orange circle.
+
+        pandas and matplotlib must be installed to call this method.
+        :param pandas pd: pandas imported module
+        :param list index: A list of labels that will be used for the X-axis
+        :rtype: matplotlib.axes.Axes
+        """
+        assert 'pandas' in sys.modules
+
+        df = pd.DataFrame(self.x_to_dict(), index=index)
+
+        xticks = range(0, len(index)) if index else None
+        ax = df.astype(float).plot(y='values', style='o-', markersize=3, xticks=xticks)
+        ax = df.astype(float).plot(y='unpl', ax=ax)
+        ax = df.astype(float).plot(y='cl', ax=ax)
+        if 'lnpl' in df:
+            ax = df.astype(float).plot(y='lnpl', ax=ax)
+
+        for i, b in enumerate(self.rule_3_runs_near_limits()):
+            if b:
+                ax.scatter(i, self.counts[i], marker='o', color='darkorange', s=40)
+
+        for i, b in enumerate(self.rule_2_runs_about_central_line()):
+            if b:
+                ax.scatter(i, self.counts[i], marker='o', color='green', s=40)
+
+        for i, b in enumerate(self.rule_1_x_indices_beyond_limits()):
+            if b:
+                ax.scatter(i, self.counts[i], marker='o', color='red', s=60)
+
+        return ax
+
+    def mr_plot(self, pd, index: Optional[list] = None):
+        """
+        Generates a matplotlib plot of the MR chart with points marked that meet the detection rules.
+
+        pandas and matplotlib must be installed to call this method.
+        :param pandas pd: pandas imported module
+        :param index: A list of labels that will be used for the X-axis
+        :rtype: matplotlib.axes.Axes
+        """
+        assert 'pandas' in sys.modules
+
+        df = pd.DataFrame(self.mr_to_dict(), index=index)
+
+        xticks = range(0, len(index)) if index else None
+        ax = df.astype(float).plot(y='values', style='o-', markersize=3, xticks=xticks)
+        ax = df.astype(float).plot(y='url', ax=ax)
+        ax = df.astype(float).plot(y='cl', ax=ax)
+
+        for i, b in enumerate(self.rule_1_mr_indices_beyond_limits()):
+            if b:
+                ax.scatter(i, self.moving_ranges()[i], marker='o', color='red', s=60)
+
+        return ax
 
     def mr_to_dict(self) -> dict:
         """

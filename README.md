@@ -55,6 +55,26 @@ pd.DataFrame(xmr.mr_to_dict()).astype(float).plot()
 
 ![Screenshot from 2023-07-22 13-53-22](https://github.com/mattmccormick/statprocon/assets/436801/b6a83903-4bb9-4935-9acb-c086d3420fd2)
 
+Charts can display X-axis labels by using the following code:
+
+```python
+labels = [...]
+pd.DataFrame(xmr.x_to_dict(), index=labels).astype(float).plot()
+```
+
+Or use built-in methods to generate charts that highlight detection points:
+
+```python
+import pandas as pd
+
+labels = [...]
+xmr = XmR(counts)
+xmr.x_plot(pd, labels)
+xmr.mr_plot(pd, labels)
+```
+
+
+
 Halfway lines between the X central line and the Upper and Lower Natural Process Limits can be returned by using the `include_halfway_lines` argument:
 
 ```python

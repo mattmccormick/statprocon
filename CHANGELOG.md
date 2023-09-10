@@ -2,6 +2,10 @@
 
 ---
 
+## 0.8.0
+
+- Add `x_plot()` and `mr_plot()` methods to plot more detailed charts using `pandas` and `matplotlib` that highlight any data points that meet the detection rules
+
 ## 0.7.0
 
 - Switch `limit_floor` parameter to constructor rather than passing through different methods
