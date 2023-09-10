@@ -75,18 +75,17 @@ xmr.mr_plot(pd, labels)
 
 ![Screenshot from 2023-09-10 11-27-40](https://github.com/mattmccormick/statprocon/assets/436801/40fd200b-c22d-442a-8dc8-b97ef1fb0a12)
 
-Data points marked with red meet detection rule 1
-Data points marked with green meet detection rule 2
-Data points marked with orange meet detection rule 3
+Data points that meet detection rules are marked by the following colours:
 
-Halfway lines between the X central line and the Upper and Lower Natural Process Limits can be returned by using the `include_halfway_lines` argument:
+|Rule|Colour|
+|---|---|
+|Rule 1|Red|
+|Rule 2|Green|
+|Rule 3|Orange|
 
-```python
-xmr.x_to_dict(include_halfway_lines=True)
-```
-
-When the process is predictable, approximately 85% of the X values fall between the Upper and Lower halfway lines.
-
+If one data point meets the criteria for multiple detection rules, the lower numbered detection rule will take priority and be marked.
+For example, if a data point meets all detection rules, it will be displayed in red.
+If a data point meets rule 2 and rule 3, it will be displayed in green.
 
 ### CSV
 
@@ -120,6 +119,16 @@ If LNPL is not needed, remove it with the following steps:
 The LNPL line will be removed from the X Chart.
 
 ## Advanced Usage
+
+### Halfway Lines
+
+Halfway lines between the X central line and the Upper and Lower Natural Process Limits can be returned by using the `include_halfway_lines` argument:
+
+```python
+xmr.x_to_dict(include_halfway_lines=True)
+```
+
+When the process is predictable, approximately 85% of the X values fall between the Upper and Lower halfway lines.
 
 ### Trending Limits
 
