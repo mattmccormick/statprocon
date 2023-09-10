@@ -39,6 +39,7 @@ class Base:
             moving_range_uses: str = AVERAGE,
             subset_start_index: int = 0,
             subset_end_index: Optional[int] = None,
+            limit_floor: TYPE_NUMERIC = Decimal('-Infinity'),
     ):
         """
 
@@ -52,6 +53,8 @@ class Base:
             Defaults to 0
         :param subset_end_index: Optional ending index + 1 of counts to calculate limits to.
             Defaults to len(n)
+        :param limit_floor: Lower Natural Process Limits will only be included in results if some
+            value is above the specified floor
         """
         assert x_central_line_uses in [AVERAGE, MEDIAN]
         assert moving_range_uses in [AVERAGE, MEDIAN]
@@ -70,6 +73,8 @@ class Base:
         else:
             self._moving_range_uses = moving_range_uses
 
+        self.limit_floor = limit_floor
+
     def __repr__(self) -> str:
         result = ''
         for k, v in self.to_dict().items():
@@ -85,7 +90,6 @@ class Base:
             self,
             include_halfway_lines: bool = False,
             moving_average_points: Optional[int] = None,
-            lower_natural_process_limit_floor: TYPE_NUMERIC = Decimal('-Infinity'),
     ) -> dict:
         """
         Return the values needed for the X chart as a dictionary
@@ -98,7 +102,7 @@ class Base:
             'lnpl_mid': self.lower_halfway_line(),
         }
 
-        if self.is_lnpl_above_floor(lower_natural_process_limit_floor):
+        if self.is_lnpl_above_floor():
             result['lnpl'] = self.lower_natural_process_limit()
 
         if not include_halfway_lines:
@@ -257,17 +261,17 @@ class Base:
 
     def lower_natural_process_limit(self) -> Sequence[Decimal]:
         """
-        :param floor: If specified, the result will be max(floor, lnpl).
-            This is useful for situations where LNPL cannot physically be lower than a certain value ie. 0
+        Returns the Lower Natural Process Limit without taking into account the `limit_floor`
+        :return: Sequence[Decimal]
         """
         sf = SF_LIMITS[self._moving_range_uses]
         limit = self.x_central_line()[0] - (sf * self.mr_central_line()[0])
         value = round(limit, ROUNDING)
         return [value] * len(self.counts)
 
-    def is_lnpl_above_floor(self, floor):
+    def is_lnpl_above_floor(self):
         lnpl = self.lower_natural_process_limit()
-        return any(x > floor for x in lnpl)
+        return any(x > self.limit_floor for x in lnpl)
 
     def rule_1_x_indices_beyond_limits(
             self,

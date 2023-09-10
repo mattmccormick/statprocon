@@ -56,12 +56,9 @@ mr_cl    : [1.000, 1.000, 1.000]
 
     def test_to_dict_lnpl_floor(self):
         counts = [1, 2, 3, 4]
-        xmr = XmR(counts)
+        xmr = XmR(counts, limit_floor=0)
 
-        lnpl = xmr.lower_natural_process_limit()
-        self.assertLess(lnpl[0], 0)
-
-        d = xmr.x_to_dict(lower_natural_process_limit_floor=0)
+        d = xmr.x_to_dict()
         self.assertNotIn('lnpl', d)
 
     def test_average_contains_one_more_exponent_as_input(self):

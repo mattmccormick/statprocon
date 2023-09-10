@@ -2,11 +2,15 @@
 
 ---
 
+## 0.7.0
+
+- Switch `limit_floor` parameter to constructor rather than passing through different methods
+
 ## 0.6.0
 
-- Add helper method `is_lnpl_above_floor()` to check if the Lower Natural Process Limit has any value that is above the specified floor argument.  This can be used to check if LNPL should be used or not.
-- Add optional parameter `lower_natural_process_limit_floor` to `x_to_dict()` method.  If the LNPL is not above this value, it will not be included in the result.
-- Remove optional `floor` parameter from `lower_natural_process_limit()`.  The helper method can be used to check if this condition occurs.
+- Add helper method `is_lnpl_above_floor()` to check if the Lower Natural Process Limit has any value that is above the specified floor argument.  This can be used to check if LNPL should be used or not
+- Add optional parameter `lower_natural_process_limit_floor` to `x_to_dict()` method.  If the LNPL is not above this value, it will not be included in the result
+- Remove optional `floor` parameter from `lower_natural_process_limit()`.  The helper method can be used to check if this condition occurs
 
 ## 0.5.1
 
