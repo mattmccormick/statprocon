@@ -73,6 +73,7 @@ xmr.x_plot(pd, labels)
 xmr.mr_plot(pd, labels)
 ```
 
+![Screenshot from 2023-09-10 11-27-40](https://github.com/mattmccormick/statprocon/assets/436801/40fd200b-c22d-442a-8dc8-b97ef1fb0a12)
 
 
 Halfway lines between the X central line and the Upper and Lower Natural Process Limits can be returned by using the `include_halfway_lines` argument:
