@@ -75,6 +75,9 @@ xmr.mr_plot(pd, labels)
 
 ![Screenshot from 2023-09-10 11-27-40](https://github.com/mattmccormick/statprocon/assets/436801/40fd200b-c22d-442a-8dc8-b97ef1fb0a12)
 
+Data points marked with red meet detection rule 1
+Data points marked with green meet detection rule 2
+Data points marked with orange meet detection rule 3
 
 Halfway lines between the X central line and the Upper and Lower Natural Process Limits can be returned by using the `include_halfway_lines` argument:
 
