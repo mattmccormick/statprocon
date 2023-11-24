@@ -54,6 +54,29 @@ mr_cl    : [1.000, 1.000, 1.000]
         expected = [None, None, None, 2.5, 3.5, 4.5, 5.5]
         self.assertListEqual(d['x_moving_average'], expected)
 
+    def test_to_dict_exponential_moving_average(self):
+        counts = [139.1, 145.2, 142.7, 143.9, 140.6, 147.1, 146.4, 142.3, 143.3, 144.5]
+        xmr = XmR(counts)
+
+        result = xmr.to_dict(include_exponential_moving_average=True)
+        result_rounded = list(map(lambda x: round(x, 1), result['x_exponential_moving_average']))
+        expected = xmr.to_decimal_list([139.1, 139.7, 140.0, 140.4, 140.4, 141.1, 141.6, 141.7, 141.8, 142.1])
+        self.assertListEqual(result_rounded, expected)
+
+    def test_x_exponential_moving_average_smoothing_factor(self):
+        xmr = XmR([0, 1])
+        with self.assertRaises(AssertionError):
+            xmr.x_exponential_moving_average(0)
+
+        with self.assertRaises(AssertionError):
+            xmr.x_exponential_moving_average(-1)
+
+        with self.assertRaises(AssertionError):
+            xmr.x_exponential_moving_average(1)
+
+        with self.assertRaises(AssertionError):
+            xmr.x_exponential_moving_average(2)
+
     def test_to_dict_lnpl_floor(self):
         counts = [1, 2, 3, 4]
         xmr = XmR(counts, limit_floor=0)

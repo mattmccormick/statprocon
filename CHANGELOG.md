@@ -2,6 +2,13 @@
 
 ---
 
+## 0.9.0
+
+- Add `x_exponential_moving_average()` method to return exponential moving averages
+- Add optional `include_exponential_moving_averages` flag to `to_dict()` to allow including the values in the returned dict
+- Add support for Python 3.12
+- Drop support for end of life Python 3.7
+
 ## 0.8.0
 
 - Add `x_plot()` and `mr_plot()` methods to plot more detailed charts using `pandas` and `matplotlib` that highlight any data points that meet the detection rules

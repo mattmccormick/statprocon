@@ -1,3 +1,4 @@
+import copy
 import csv
 import io
 import statistics
@@ -60,7 +61,7 @@ class Base:
         assert x_central_line_uses in [AVERAGE, MEDIAN]
         assert moving_range_uses in [AVERAGE, MEDIAN]
 
-        self.counts = cast(TYPE_COUNTS, self.to_decimal_list(counts))
+        self.counts = cast(List[Decimal], self.to_decimal_list(counts))
         self.i = max(0, subset_start_index)
         self.j = len(counts)
         if subset_end_index:
@@ -91,6 +92,7 @@ class Base:
             self,
             include_halfway_lines: bool = False,
             moving_average_points: Optional[int] = None,
+            include_exponential_moving_average: bool = False,
     ) -> dict:
         """
         Return the values needed for the X chart as a dictionary
@@ -112,6 +114,9 @@ class Base:
 
         if moving_average_points:
             result['moving_average'] = self.x_moving_average(moving_average_points)  # type: ignore[assignment]
+
+        if include_exponential_moving_average:
+            result['exponential_moving_average'] = self.x_exponential_moving_average()
 
         return result
 
@@ -192,6 +197,7 @@ class Base:
             self,
             include_halfway_lines: bool = False,
             moving_average_points: Optional[int] = None,
+            include_exponential_moving_average: bool = False,
     ) -> dict:
         # Naming comes from pg. 163
         #   So Which Way Should You Compute Limits? from Making Sense of Data
@@ -202,11 +208,14 @@ class Base:
             X central line and LNPL.
         :param moving_average_points: If set, 'moving_average` will be included in the result and
             will be computed based on the number of points.
+        :param include_exponential_moving_average: If set to True, `exponential_moving_average` will
+            be included in the result using a smoothing factor of 0.9
         """
         result = {}
         x_dict = self.x_to_dict(
             include_halfway_lines=include_halfway_lines,
             moving_average_points=moving_average_points,
+            include_exponential_moving_average=include_exponential_moving_average,
         )
         for k, v in x_dict.items():
             result[f'x_{k}'] = v
@@ -263,6 +272,23 @@ class Base:
             ma = sum(self.counts[i-n+1:i+1]) / nd
             result.append(ma)
 
+        return result
+
+    def x_exponential_moving_average(self, smoothing_factor: float = 0.9) -> List[Decimal]:
+        """
+        Returns the Exponential Moving Average for the X data
+        :param smoothing_factor The smoothing factor to apply to the function.
+            Must be between 0 and 1 exclusive.
+        :return:
+        """
+        assert 0 < smoothing_factor < 1
+
+        result: list[Decimal] = copy.deepcopy(self.counts)
+        smoothing_pct = Decimal('1') - Decimal(str(smoothing_factor))
+        for i in range(1, len(result)):
+            curr = result[i]
+            prev = result[i-1]
+            result[i] = round(prev + smoothing_pct * (curr - prev), ROUNDING)
         return result
 
     def mr_central_line(self) -> Sequence[Decimal]:
