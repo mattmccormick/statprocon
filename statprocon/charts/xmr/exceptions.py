@@ -1,0 +1,2 @@
+class InvalidCountsError(Exception):
+    pass

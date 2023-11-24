@@ -2,6 +2,11 @@
 
 ---
 
+## 1.0.0
+
+- Public release
+- Raise exception if less than 2 counts are provided
+
 ## 0.9.0
 
 - Add `x_exponential_moving_average()` method to return exponential moving averages

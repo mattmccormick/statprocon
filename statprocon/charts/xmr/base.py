@@ -8,6 +8,7 @@ from decimal import Decimal
 from typing import cast, List, Optional, Sequence, Union
 
 from .constants import INVALID, ROUNDING
+from .exceptions import InvalidCountsError
 from .types import (
     TYPE_COUNTS,
     TYPE_COUNTS_INPUT,
@@ -60,6 +61,9 @@ class Base:
         """
         assert x_central_line_uses in [AVERAGE, MEDIAN]
         assert moving_range_uses in [AVERAGE, MEDIAN]
+
+        if len(counts) < 2:
+            raise InvalidCountsError('Provide at least 2 data points')
 
         self.counts = cast(List[Decimal], self.to_decimal_list(counts))
         self.i = max(0, subset_start_index)

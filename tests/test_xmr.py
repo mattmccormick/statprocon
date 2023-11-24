@@ -3,15 +3,20 @@ import unittest
 from decimal import Decimal
 
 from statprocon import XmR
+from statprocon.charts.xmr.exceptions import InvalidCountsError
 from statprocon.charts.xmr.types import TYPE_COUNT_VALUE
 
 
 class XmRTestCase(unittest.TestCase):
     def test_empty_data(self):
         counts = []
-        xmr = XmR(counts)
-        mr = xmr.moving_ranges()
-        self.assertEqual(mr, [])
+        with self.assertRaises(InvalidCountsError):
+            XmR(counts)
+
+    def test_one_data_point(self):
+        counts = [1]
+        with self.assertRaises(InvalidCountsError):
+            XmR(counts)
 
     def test_repr(self):
         counts = [3, 4, 5]
