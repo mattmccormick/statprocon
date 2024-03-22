@@ -58,7 +58,7 @@ pd.DataFrame(xmr.mr_to_dict()).astype(float).plot()
 Charts can display X-axis labels by using the following code:
 
 ```python
-labels = [...]
+labels = ['0', '1', '2', '3']
 pd.DataFrame(xmr.x_to_dict(), index=labels).astype(float).plot()
 ```
 
@@ -67,7 +67,7 @@ Or use built-in methods to generate charts that highlight detection points:
 ```python
 import pandas as pd
 
-labels = [...]
+labels = ['J', 'F', 'M', ...]
 xmr = XmR(counts)
 xmr.x_plot(pd, labels)
 xmr.mr_plot(pd, labels)
