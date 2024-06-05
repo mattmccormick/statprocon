@@ -21,7 +21,7 @@ more-itertools==9.1.0
 mypy==1.4.1
 mypy-extensions==1.0.0
 packaging==23.1
-pkginfo==1.9.6
+pkginfo==1.11.0
 platformdirs==3.9.1
 pluggy==1.2.0
 pycparser==2.21
@@ -38,7 +38,7 @@ six==1.16.0
 statprocon @ file:///home/matt/projects/statprocon
 tomli==2.0.1
 tox==4.6.4
-twine==4.0.2
+twine==5.1.0
 types-docutils==0.20.0.1
 typing_extensions==4.7.1
 urllib3==2.0.3

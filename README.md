@@ -212,7 +212,7 @@ python -m build
 [Upload](https://packaging.python.org/en/latest/tutorials/packaging-projects/#uploading-the-distribution-archives)
 
 ```shell
-python -m twine upload dist/*
+python -m twine upload dist/statprocon-x.y.z*
 ```
 
 ### Testing
