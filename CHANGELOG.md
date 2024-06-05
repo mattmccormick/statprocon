@@ -2,6 +2,10 @@
 
 ---
 
+## 1.0.1
+
+- Fix bug with trending limits not being computed correctly when using subsets
+
 ## 1.0.0
 
 - Public release

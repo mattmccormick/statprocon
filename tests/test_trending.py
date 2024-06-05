@@ -81,6 +81,27 @@ class TrendingTestCase(unittest.TestCase):
         expected[17] = True
         self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(), expected)
 
+    def test_trending_limits_subset_start_and_end(self):
+        counts = [
+            5218781, 5385423, 5251728, 5364266, 5466729, 5631477, 5678999, 5757659, 5877636,
+            5917390, 6026344, 6137704, 6417100, 6561540, 6719511, 7018027, 7136908, 7318859,
+            7538297, 7656486, 7761125, 7785418, 7607722, 7985326, 8497524, 6582273,
+        ]
+
+        c_subset = XmR(counts[2:15])
+        xmr_subset = XmRTrending(c_subset)
+
+        c = XmR(counts, subset_start_index=2, subset_end_index=15)
+        xmr = XmRTrending(c)
+
+        self.assertEqual(xmr_subset.slope(), xmr.slope())
+
+        half_average_1 = sum(counts[2:8]) / 6  # 5525143
+        half_average_2 = sum(counts[9:15]) / 6  # 6296598.1666
+
+        expected = Decimal((half_average_2 - half_average_1) / 6)  # 128575.86111
+        self.assertEqual(round(expected, 5), round(xmr.slope(), 5))
+
     def test_lower_natural_process_limit_floor(self):
         counts = [0, 1, 2, 3, 4]
 

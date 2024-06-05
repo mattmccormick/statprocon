@@ -59,14 +59,14 @@ class Trending(XmR):
         delta = unpl0[0] - x_cl0[0]
         result = [x + delta for x in self.x_central_line()]
         return result
-    
+
     def lower_natural_process_limit(self, floor: Union[Decimal, int, float] = Decimal('-Infinity')) -> Sequence[Decimal]:
         lnpl0 = self.xmr.lower_natural_process_limit()
         x_cl0 = self.xmr.x_central_line()
         delta = x_cl0[0] - lnpl0[0]
         result = [max(x - delta, Decimal(str(floor))) for x in self.x_central_line()]
         return result
-    
+
     def slope(self) -> Decimal:
         """
         Returns the trend or slope of the limit and central lines
@@ -76,12 +76,14 @@ class Trending(XmR):
         nd = Decimal(str(n))
 
         half_average2 = sum(self.xmr.counts[(self.j-n):self.j]) / nd
+        half_average1 = self._half_average1()
 
-        return (half_average2 - self._half_average1()) / nd
+        result = (half_average2 - half_average1) / nd
+        return result
 
     def _half_n(self) -> int:
         return len(self.xmr.counts[self.i:self.j]) // 2
 
     def _half_average1(self) -> Decimal:
         n = self._half_n()
-        return sum(self.xmr.counts[self.i:n]) / Decimal(str(n))
+        return sum(self.xmr.counts[self.i:self.i+n]) / Decimal(str(n))
