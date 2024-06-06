@@ -81,6 +81,24 @@ class TrendingTestCase(unittest.TestCase):
         expected[17] = True
         self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(), expected)
 
+    def test_trending_limits_with_subsets(self):
+        # Region D
+        counts = [
+            0, 1,
+            539, 558, 591, 556, 540, 590, 606, 643, 657, 602,
+            596, 640, 691, 723, 701, 802, 749, 762, 807, 781,
+            1000, 2000,
+        ]
+
+        xmr_normal = XmR(counts[2:-2])
+        trend_normal = XmRTrending(xmr_normal)
+
+        xmr_subsets = XmR(counts, subset_start_index=2, subset_end_index=22)
+        trend_subsets = XmRTrending(xmr_subsets)
+
+        self.assertEqual(trend_normal.x_central_line(), trend_subsets.x_central_line()[2:-2])
+
+
     def test_trending_limits_subset_start_and_end(self):
         counts = [
             5218781, 5385423, 5251728, 5364266, 5466729, 5631477, 5678999, 5757659, 5877636,
@@ -89,12 +107,17 @@ class TrendingTestCase(unittest.TestCase):
         ]
 
         c_subset = XmR(counts[2:15])
+        self.assertEqual(Decimal('5908314.077'), c_subset.x_central_line()[0])
         xmr_subset = XmRTrending(c_subset)
 
         c = XmR(counts, subset_start_index=2, subset_end_index=15)
+        self.assertEqual(Decimal('5908314.077'), c.x_central_line()[0])
         xmr = XmRTrending(c)
 
         self.assertEqual(xmr_subset.slope(), xmr.slope())
+
+        self.assertEqual(Decimal('5203703.347222222222222222223'), xmr.x_central_line()[2])
+        self.assertEqual(xmr_subset.x_central_line(), xmr.x_central_line()[2:15])
 
         half_average_1 = sum(counts[2:8]) / 6  # 5525143
         half_average_2 = sum(counts[9:15]) / 6  # 6296598.1666

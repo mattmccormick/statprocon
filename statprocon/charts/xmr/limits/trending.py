@@ -30,18 +30,18 @@ class Trending(XmR):
 
         result: list[Decimal] = [INVALID] * n
         m = self._half_n()
-        h = (m + self.i) // 2
+        h = m // 2 + self.i
         s = self.slope()
 
         is_odd = m % 2
         if is_odd:
-            # ie. if m == 9, then insert ha1 at position 4
+            # i.e. if m == 9, then insert ha1 at position 4
             # 0 1 2 3 |4| 5 6 7 8 9
             result[h] = self._half_average1()
         else:
-            # ie. if m == 10, then insert ha1 at position 5 but calculate the value
+            # i.e. if m == 10, then insert ha1 at position 5 but calculate the value
             # based on half the slope
-            # since the mid point is halfway between 4 and 5
+            # since the midpoint is halfway between 4 and 5
             # 0 1 2 3 4 | 5 6 7 8 9
             result[h] = self._half_average1() + Decimal('0.5') * s
 
@@ -86,4 +86,5 @@ class Trending(XmR):
 
     def _half_average1(self) -> Decimal:
         n = self._half_n()
-        return sum(self.xmr.counts[self.i:self.i+n]) / Decimal(str(n))
+        result = sum(self.xmr.counts[self.i:self.i+n]) / Decimal(str(n))
+        return result
