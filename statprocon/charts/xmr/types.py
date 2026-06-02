@@ -1,13 +1,6 @@
 from decimal import Decimal
 
-from packaging.markers import Marker
-from typing import Union, Sequence
-
-py310 = Marker('python_version >= "3.10"')
-if py310.evaluate():
-    from typing import TypeAlias
-else:
-    from typing_extensions import TypeAlias
+from typing import Union, Sequence, TypeAlias
 
 # TODO: can replace Union with | when only supporting >= 3.10
 TYPE_COUNT_VALUE: TypeAlias = Union[Decimal, int]
