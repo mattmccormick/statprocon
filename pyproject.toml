@@ -10,7 +10,7 @@ authors = [
 ]
 description = "A Python helper library for generating Process Behaviour Charts"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -26,3 +26,9 @@ dependencies = [
 "Homepage" = "https://github.com/mattmccormick/statprocon"
 "Bug Tracker" = "https://github.com/mattmccormick/statprocon/issues"
 "Changelog" = "https://github.com/mattmccormick/statprocon/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14.1",
+    "mypy-extensions>=1.0.0",
+]

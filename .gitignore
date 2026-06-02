@@ -1,5 +1,7 @@
-.tox/
 dist/
 venv/
+.venv/
 .ipynb_checkpoints
 *.ipynb
+__pycache__/
+.mypy_cache/
