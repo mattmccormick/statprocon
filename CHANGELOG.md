@@ -2,6 +2,14 @@
 
 ---
 
+## 2.0.0
+
+- **Breaking:** Drop support for end-of-life Python 3.9; Python 3.10 is now the minimum supported version
+- Add support for Python 3.13 and 3.14
+- Remove runtime dependencies on `packaging` and `typing_extensions`; the core package now has no required dependencies
+- **Breaking:** `x_plot()` and `mr_plot()` no longer take a `pandas` module argument. Install the optional `plot` extra (`pip install statprocon[plot]`) and they import pandas themselves
+- Add optional `plot` extra that installs `matplotlib` and `pandas` for the built-in plotting helpers
+
 ## 1.0.2
 
 - Fix bug with halfway point not being calculated correctly for trending limits when using subsets
