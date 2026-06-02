@@ -34,6 +34,7 @@ plot = [
 dev = [
     "mypy>=1.14.1",
     "mypy-extensions>=1.0.0",
+    "ruff>=0.15.0",
 ]
 
 [tool.mypy]
@@ -42,3 +43,12 @@ dev = [
 [[tool.mypy.overrides]]
 module = ["pandas.*", "matplotlib.*"]
 ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 88
+# Mirror requires-python so future lint rules stay safe for all supported versions.
+target-version = "py310"
+
+[tool.ruff.format]
+# Leave existing quote styles untouched.
+quote-style = "preserve"

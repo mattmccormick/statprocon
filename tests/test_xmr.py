@@ -64,8 +64,12 @@ mr_cl    : [1.000, 1.000, 1.000]
         xmr = XmR(counts)
 
         result = xmr.to_dict(include_exponential_moving_average=True)
-        result_rounded = list(map(lambda x: round(x, 1), result['x_exponential_moving_average']))
-        expected = xmr.to_decimal_list([139.1, 139.7, 140.0, 140.4, 140.4, 141.1, 141.6, 141.7, 141.8, 142.1])
+        result_rounded = list(
+            map(lambda x: round(x, 1), result['x_exponential_moving_average'])
+        )
+        expected = xmr.to_decimal_list(
+            [139.1, 139.7, 140.0, 140.4, 140.4, 141.1, 141.6, 141.7, 141.8, 142.1]
+        )
         self.assertListEqual(result_rounded, expected)
 
     def test_x_exponential_moving_average_smoothing_factor(self):
@@ -110,18 +114,24 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts = [5.4, 3.8, 8.75, 3.6, 3, 6, 7.4, 10, 5.8, 6.6, 3, 8.8]
         xmr = XmR(counts)
         mr = xmr.moving_ranges()
-        expected = xmr.to_decimal_list([None, 1.6, 4.95, 5.15, 0.6, 3, 1.4, 2.6, 4.2, 0.8, 3.6, 5.8])
+        expected = xmr.to_decimal_list(
+            [None, 1.6, 4.95, 5.15, 0.6, 3, 1.4, 2.6, 4.2, 0.8, 3.6, 5.8]
+        )
         self.assertListEqual(mr, expected)
 
     def test_upper_range_limit(self):
-        counts = [1,51, 100, 50]
+        counts = [1, 51, 100, 50]
         xmr = XmR(counts)
-        self._assert_func_output_equals_line(xmr, 'upper_range_limit', Decimal('162.312'))
+        self._assert_func_output_equals_line(
+            xmr, 'upper_range_limit', Decimal('162.312')
+        )
 
     def test_upper_natural_process_limit(self):
         counts = [1, 10, 100, 50]
         xmr = XmR(counts)
-        self._assert_func_output_equals_line(xmr, 'upper_natural_process_limit', Decimal('172.364'))
+        self._assert_func_output_equals_line(
+            xmr, 'upper_natural_process_limit', Decimal('172.364')
+        )
 
     def test_limits_with_subsets(self):
         counts = [1] * 25
@@ -130,10 +140,14 @@ mr_cl    : [1.000, 1.000, 1.000]
         counts[3] = 50
 
         xmr = XmR(counts, subset_start_index=4, subset_end_index=24)
-        self._assert_func_output_equals_line(xmr, 'upper_natural_process_limit', Decimal('1.000'))
+        self._assert_func_output_equals_line(
+            xmr, 'upper_natural_process_limit', Decimal('1.000')
+        )
         self._assert_func_output_equals_line(xmr, 'upper_range_limit', Decimal('0'))
         self._assert_func_output_equals_line(xmr, 'x_central_line', 1)
-        self.assertEqual(xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit())
+        self.assertEqual(
+            xmr.lower_natural_process_limit(), xmr.upper_natural_process_limit()
+        )
 
     def test_rule_1_points_beyond_upper_limits(self):
         """
@@ -149,7 +163,9 @@ mr_cl    : [1.000, 1.000, 1.000]
         expected = [False] * len(group_a)
         for i in [0, 1]:
             expected[i] = True
-        self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(group_b_upper, group_b_lower), expected)
+        self.assertListEqual(
+            xmr.rule_1_x_indices_beyond_limits(group_b_upper, group_b_lower), expected
+        )
 
     def test_rule_1_points_beyond_lower_limits(self):
         """
@@ -164,17 +180,21 @@ mr_cl    : [1.000, 1.000, 1.000]
         expected = [False] * len(group_b)
         for i in [7, 8, 10, 11]:
             expected[i] = True
-        self.assertListEqual(xmr.rule_1_x_indices_beyond_limits(group_a_upper, group_a_lower), expected)
+        self.assertListEqual(
+            xmr.rule_1_x_indices_beyond_limits(group_a_upper, group_a_lower), expected
+        )
 
     def test_rule_1_points_beyond_both_limits(self):
         """
         This test dataset comes from Table 9.2: Accounts Receivable for Years One and Two in Making Sense of Data
         """
 
+        # fmt: off
         ar_pct_sales = [
             '55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2',
             '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9',
         ]
+        # fmt: on
         xmr = XmR(ar_pct_sales)
 
         upper_limit = Decimal('60.7')
@@ -186,16 +206,20 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertListEqual(actual, expected)
 
         # Point 13 is detected in the chart in the book because the actual percentage is slightly lower than the limit
-        self.assertFalse(actual[13], 'Point 13 equals the limit and should not be detected')
+        self.assertFalse(
+            actual[13], 'Point 13 equals the limit and should not be detected'
+        )
 
     def test_rule_1_point_beyond_upper_range_limit(self):
         """
         This test dataset also comes from Table 9.2
         """
+        # fmt: off
         ar_pct_sales = [
             '55.6', '54.7', '54.9', '54.8', '56.9', '55.7', '53.8', '54.8', '53.4', '57.0', '59.4', '63.2',
             '60.9', '60.7', '58.6', '57.3', '56.9', '58.1', '58.3', '50.9', '53.3', '52.5', '50.8', '52.9',
         ]
+        # fmt: on
         xmr = XmR(ar_pct_sales)
 
         expected = [False] * len(ar_pct_sales)
@@ -206,14 +230,16 @@ mr_cl    : [1.000, 1.000, 1.000]
         """
         This test dataset comes from Table 8.1: Percentage of High School Seniors Who Smooke Daily in Making Sense of Data
         """
-        percentages = [21.3, 20.2, 20.9, 21.0, 18.8, 19.6, 18.7, 18.6, 18.1, 18.9, 19.2, 18.2, 17.3, 19.0]
+        percentages = [21.3, 20.2, 20.9, 21.0, 18.8, 19.6, 18.7, 18.6, 18.1, 18.9, 19.2, 18.2, 17.3, 19.0]  # fmt: skip
 
         xmr = XmR(percentages)
 
+        # fmt: off
         expected = [
             False, False, False, False, False, False,
             True, True, True, True, True, True, True, True
         ]
+        # fmt: on
         self.assertListEqual(xmr.rule_2_runs_about_central_line(), expected)
 
     def test_rule_3(self):
@@ -223,7 +249,7 @@ mr_cl    : [1.000, 1.000, 1.000]
         @see test_peak_flow_rates
         """
 
-        x_values = [120, 140, 100, 150, 260, 150, 100, 120, 300, 300, 275, 300, 140, 1750, 150, 150, 190, 180]
+        x_values = [120, 140, 100, 150, 260, 150, 100, 120, 300, 300, 275, 300, 140, 1750, 150, 150, 190, 180]  # fmt: skip
 
         xmr = XmR(x_values)
 
@@ -238,8 +264,8 @@ mr_cl    : [1.000, 1.000, 1.000]
             Data Set to Use When Verifying Software
         """
 
-        counts = [5045, 4350, 4350, 3975, 4290, 4430, 4485, 4285, 3980, 3925, 3645, 3760, 3300, 3685, 3463, 5200]
-        moving_ranges = [None, 695, 0, 375, 315, 140, 55, 200, 305, 55, 280, 115, 460, 385, 222, 1737]
+        counts = [5045, 4350, 4350, 3975, 4290, 4430, 4485, 4285, 3980, 3925, 3645, 3760, 3300, 3685, 3463, 5200]  # fmt: skip
+        moving_ranges = [None, 695, 0, 375, 315, 140, 55, 200, 305, 55, 280, 115, 460, 385, 222, 1737]  # fmt: skip
         x_avg = Decimal('4135.50')
         mr_avg = Decimal('355.93')
         lnpl = Decimal('3188.72')
@@ -261,8 +287,8 @@ mr_cl    : [1.000, 1.000, 1.000]
         Figure 9.9 XmR Chart for AM Premedication Peak Flow Rates for Days 1 to 18
         """
 
-        x_values = [120, 140, 100, 150, 260, 150, 100, 120, 300, 300, 275, 300, 140, 170, 150, 150, 190, 180]
-        mr_values = [None, 20, 40, 50, 110, 110, 50, 20, 180, 0, 25, 25, 160, 30, 20, 0, 40, 10]
+        x_values = [120, 140, 100, 150, 260, 150, 100, 120, 300, 300, 275, 300, 140, 170, 150, 150, 190, 180]  # fmt: skip
+        mr_values = [None, 20, 40, 50, 110, 110, 50, 20, 180, 0, 25, 25, 160, 30, 20, 0, 40, 10]  # fmt: skip
         x_cl = Decimal('183.1')
         mr_cl = Decimal('52.4')
 
@@ -303,12 +329,14 @@ mr_cl    : [1.000, 1.000, 1.000]
     def test_median_x_central_line(self):
         # Data comes from pg. 147 of Making Sense of Data
         # s10.2 Episode Treatment Groups
+        # fmt: off
         x_values = [
             260, 130, 189, 1080, 175, 200, 193, 120, 33,
             293, 195, 571, 55698, 209, 1825, 239, 290, 254,
             93, 278, 185, 123, 9434, 408, 570, 118, 238,
             207, 153, 209, 243, 110, 306, 343, 244,
         ]
+        # fmt: on
         x_cl = 238
         mr_cl = 125
         unpl = 631.125  # 630 in book
@@ -323,7 +351,9 @@ mr_cl    : [1.000, 1.000, 1.000]
         self.assertEqual(unpl, xmr.upper_natural_process_limit()[0])
         self.assertEqual(url, xmr.upper_range_limit()[0])
 
-    def _assert_func_output_equals_line(self, xmr: XmR, func: str, value: TYPE_COUNT_VALUE):
+    def _assert_func_output_equals_line(
+        self, xmr: XmR, func: str, value: TYPE_COUNT_VALUE
+    ):
         actual = getattr(xmr, func)()
         self._assert_line_equals(actual, value)
 
