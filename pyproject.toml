@@ -17,10 +17,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 keywords = ["Statistical Process Control", "SPC", "Quality Control Chart", "QCC", "Process Behaviour Chart", "Process Behavior Chart", "XmR", "Shewhart", "Wheeler"]
-dependencies = [
-    "packaging",
-    "typing_extensions",
-]
+dependencies = []
 
 [project.urls]
 "Homepage" = "https://github.com/mattmccormick/statprocon"
