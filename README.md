@@ -191,38 +191,37 @@ This package also contains extensive tests for verifying the integrity of the ca
 ---
 ## Development
 
-Create virtualenv
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management and packaging.
+Install it by following the [installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+
+Create the virtual environment and install all dependencies (including dev tools):
 
 ```shell
-python3 -m venv venv
+uv sync
 ```
 
-Activate virtualenv
+[Build](https://docs.astral.sh/uv/concepts/projects/build/)
 
 ```shell
-source venv/bin/activate
+uv build
 ```
 
-[Build](https://packaging.python.org/en/latest/tutorials/packaging-projects/#generating-distribution-archiveshttps://packaging.python.org/en/latest/tutorials/packaging-projects/#generating-distribution-archives)
+[Upload](https://docs.astral.sh/uv/guides/package/#publishing-your-package)
 
 ```shell
-python -m build
-```
-
-[Upload](https://packaging.python.org/en/latest/tutorials/packaging-projects/#uploading-the-distribution-archives)
-
-```shell
-python -m twine upload dist/statprocon-x.y.z*
+uv publish
 ```
 
 ### Testing
 
-[Install package from source](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#installing-from-source)
+Run tests
+
 ```shell
-python3 -m pip install .
+uv run python -m unittest discover
 ```
 
-Run tests
+Run type checking
+
 ```shell
-tox
+uv run mypy statprocon tests
 ```
