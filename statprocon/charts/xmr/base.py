@@ -1,11 +1,11 @@
 import copy
 import csv
+import importlib.util
 import io
 import statistics
-import sys
 
 from decimal import Decimal
-from typing import cast, List, Optional, Sequence, Union
+from typing import Any, cast, List, Optional, Sequence, Union
 
 from .constants import INVALID, ROUNDING
 from .exceptions import InvalidCountsError
@@ -32,6 +32,30 @@ SF_RANGES = {
     AVERAGE: Decimal('3.268'),
     MEDIAN: Decimal('3.865'),
 }
+
+_PLOT_DEPS_MSG = (
+    'Plotting requires pandas and matplotlib, which are not installed. '
+    'Install them with: pip install statprocon[plot]'
+)
+
+
+def _import_pandas() -> Any:
+    """
+    Import and return the pandas module for plotting.
+
+    pandas is imported lazily so that importing statprocon never requires the
+    optional plotting dependencies. Raises a helpful ImportError if pandas or
+    matplotlib is unavailable.
+    """
+    try:
+        import pandas as pd
+    except ImportError as e:
+        raise ImportError(_PLOT_DEPS_MSG) from e
+
+    if importlib.util.find_spec('matplotlib') is None:
+        raise ImportError(_PLOT_DEPS_MSG)
+
+    return pd
 
 
 class Base:
@@ -124,7 +148,7 @@ class Base:
 
         return result
 
-    def x_plot(self, pd, index: Optional[list] = None):
+    def x_plot(self, index: Optional[list] = None):
         """
         Generates a matplotlib plot of the X chart with points marked that meet the detection rules.
         Detection rules are prioritized such that Rule 1 data points will override Rule 2 data points
@@ -133,12 +157,11 @@ class Base:
         Points that meet Rule 2 will be marked by a green circle.
         Points that meet Rule 3 will be marked by an orange circle.
 
-        pandas and matplotlib must be installed to call this method.
-        :param pandas pd: pandas imported module
+        Requires the optional plotting dependencies: pip install statprocon[plot]
         :param list index: A list of labels that will be used for the X-axis
         :rtype: matplotlib.axes.Axes
         """
-        assert 'pandas' in sys.modules
+        pd = _import_pandas()
 
         df = pd.DataFrame(self.x_to_dict(), index=index)
 
@@ -163,16 +186,15 @@ class Base:
 
         return ax
 
-    def mr_plot(self, pd, index: Optional[list] = None):
+    def mr_plot(self, index: Optional[list] = None):
         """
         Generates a matplotlib plot of the MR chart with points marked that meet the detection rules.
 
-        pandas and matplotlib must be installed to call this method.
-        :param pandas pd: pandas imported module
+        Requires the optional plotting dependencies: pip install statprocon[plot]
         :param index: A list of labels that will be used for the X-axis
         :rtype: matplotlib.axes.Axes
         """
-        assert 'pandas' in sys.modules
+        pd = _import_pandas()
 
         df = pd.DataFrame(self.mr_to_dict(), index=index)
 

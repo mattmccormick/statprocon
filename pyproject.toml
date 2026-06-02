@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "statprocon"
-version = "1.0.2"
+version = "2.0.0"
 authors = [
   { name="Matt McCormick", email="mattmccor@gmail.com" },
 ]
@@ -19,6 +19,12 @@ classifiers = [
 keywords = ["Statistical Process Control", "SPC", "Quality Control Chart", "QCC", "Process Behaviour Chart", "Process Behavior Chart", "XmR", "Shewhart", "Wheeler"]
 dependencies = []
 
+[project.optional-dependencies]
+plot = [
+    "matplotlib>=3.10",
+    "pandas>=2.3",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/mattmccormick/statprocon"
 "Bug Tracker" = "https://github.com/mattmccormick/statprocon/issues"
@@ -29,3 +35,10 @@ dev = [
     "mypy>=1.14.1",
     "mypy-extensions>=1.0.0",
 ]
+
+[tool.mypy]
+# The optional plotting dependencies ship without type information, so treat
+# them as untyped rather than requiring stub packages.
+[[tool.mypy.overrides]]
+module = ["pandas.*", "matplotlib.*"]
+ignore_missing_imports = true

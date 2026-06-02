@@ -14,6 +14,13 @@ SPC Charts help answer questions like:
 pip install statprocon
 ```
 
+To use the built-in plotting helpers (`x_plot()` / `mr_plot()`), install the optional `plot` extra,
+which pulls in matplotlib and pandas:
+
+```shell
+pip install statprocon[plot]
+```
+
 ## Usage
 
 ```python
@@ -62,15 +69,14 @@ labels = ['0', '1', '2', '3']
 pd.DataFrame(xmr.x_to_dict(), index=labels).astype(float).plot()
 ```
 
-Or use built-in methods to generate charts that highlight detection points:
+Or use built-in methods to generate charts that highlight detection points.
+These require the optional plotting dependencies (`pip install statprocon[plot]`):
 
 ```python
-import pandas as pd
-
 labels = ['J', 'F', 'M', ...]
 xmr = XmR(counts)
-xmr.x_plot(pd, labels)
-xmr.mr_plot(pd, labels)
+xmr.x_plot(labels)
+xmr.mr_plot(labels)
 ```
 
 ![Screenshot from 2023-09-10 11-27-40](https://github.com/mattmccormick/statprocon/assets/436801/40fd200b-c22d-442a-8dc8-b97ef1fb0a12)
@@ -183,8 +189,8 @@ When these optional arguments are not provided, `subset_start_index` defaults to
 ## Dependencies
 
 There are a few other Python libraries for generating SPC charts but they all contain large dependencies in order to include the ability to graph the chart.
-This package will remain small and light and not require large dependencies.
-The user will need to convert the data into charts on their own.
+This package will remain small and light: the core package has no required dependencies, and the data can be converted into charts on your own.
+The plotting helpers (`x_plot()` / `mr_plot()`) are optional and only pull in matplotlib and pandas when you install the `plot` extra (`pip install statprocon[plot]`).
 
 This package also contains extensive tests for verifying the integrity of the calculated data.
 
