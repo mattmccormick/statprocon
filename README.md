@@ -206,17 +206,30 @@ Create the virtual environment and install all dependencies (including dev tools
 uv sync
 ```
 
-[Build](https://docs.astral.sh/uv/concepts/projects/build/)
+To [build](https://docs.astral.sh/uv/concepts/projects/build/) the distribution locally:
 
 ```shell
 uv build
 ```
 
-[Upload](https://docs.astral.sh/uv/guides/package/#publishing-your-package)
+### Releasing
 
-```shell
-uv publish
-```
+Releases are published to PyPI automatically by the
+[release workflow](.github/workflows/release.yml) when a version tag is pushed:
+
+1. Bump `version` in `pyproject.toml` and add a matching section to `CHANGELOG.md`.
+2. Merge to `main`.
+3. Tag the release and push the tag:
+
+   ```shell
+   git tag v2.0.1
+   git push origin v2.0.1
+   ```
+
+The workflow verifies the tag matches the package version, builds the
+distribution, publishes to PyPI via [trusted publishing](https://docs.pypi.org/trusted-publishers/)
+(no API tokens), and creates a GitHub Release from the CHANGELOG entry.
+Publishing waits for manual approval on the protected `pypi` environment.
 
 ### Testing
 
