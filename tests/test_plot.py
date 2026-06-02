@@ -82,7 +82,3 @@ class PlotMissingDepsTestCase(unittest.TestCase):
             with self.assertRaises(ImportError) as ctx:
                 xmr.x_plot()
         self.assertIn('statprocon[plot]', str(ctx.exception))
-
-
-if __name__ == '__main__':
-    unittest.main()
