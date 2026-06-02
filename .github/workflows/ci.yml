@@ -51,9 +51,24 @@ jobs:
       - name: Run mypy
         run: uv run mypy statprocon tests
 
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Check formatting
+        run: uv run ruff format --check
+
   build:
     name: Build distribution
-    needs: [test, typecheck]
+    needs: [test, typecheck, format]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -60,13 +60,13 @@ def _import_pandas() -> Any:
 
 class Base:
     def __init__(
-            self,
-            counts: TYPE_COUNTS_INPUT,
-            x_central_line_uses: str = AVERAGE,
-            moving_range_uses: str = AVERAGE,
-            subset_start_index: int = 0,
-            subset_end_index: Optional[int] = None,
-            limit_floor: TYPE_NUMERIC = Decimal('-Infinity'),
+        self,
+        counts: TYPE_COUNTS_INPUT,
+        x_central_line_uses: str = AVERAGE,
+        moving_range_uses: str = AVERAGE,
+        subset_start_index: int = 0,
+        subset_end_index: Optional[int] = None,
+        limit_floor: TYPE_NUMERIC = Decimal('-Infinity'),
     ):
         """
 
@@ -117,10 +117,10 @@ class Base:
         return result
 
     def x_to_dict(
-            self,
-            include_halfway_lines: bool = False,
-            moving_average_points: Optional[int] = None,
-            include_exponential_moving_average: bool = False,
+        self,
+        include_halfway_lines: bool = False,
+        moving_average_points: Optional[int] = None,
+        include_exponential_moving_average: bool = False,
     ) -> dict:
         """
         Return the values needed for the X chart as a dictionary
@@ -220,10 +220,10 @@ class Base:
         }
 
     def to_dict(
-            self,
-            include_halfway_lines: bool = False,
-            moving_average_points: Optional[int] = None,
-            include_exponential_moving_average: bool = False,
+        self,
+        include_halfway_lines: bool = False,
+        moving_average_points: Optional[int] = None,
+        include_exponential_moving_average: bool = False,
     ) -> dict:
         # Naming comes from pg. 163
         #   So Which Way Should You Compute Limits? from Making Sense of Data
@@ -254,16 +254,20 @@ class Base:
         output = io.StringIO()
         writer = csv.writer(output)
 
-        writer.writerow(['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl'])
-        writer.writerows(zip(
-            self.counts,
-            self.upper_natural_process_limit(),
-            self.x_central_line(),
-            self.lower_natural_process_limit(),
-            self.moving_ranges(),
-            self.upper_range_limit(),
-            self.mr_central_line()
-        ))
+        writer.writerow(
+            ['x_values', 'x_unpl', 'x_cl', 'x_lnpl', 'mr_values', 'mr_url', 'mr_cl']
+        )
+        writer.writerows(
+            zip(
+                self.counts,
+                self.upper_natural_process_limit(),
+                self.x_central_line(),
+                self.lower_natural_process_limit(),
+                self.moving_ranges(),
+                self.upper_range_limit(),
+                self.mr_central_line(),
+            )
+        )
         return output.getvalue()
 
     def moving_ranges(self) -> TYPE_MOVING_RANGES:
@@ -281,7 +285,7 @@ class Base:
         return result
 
     def x_central_line(self) -> Sequence[Decimal]:
-        valid_values = self.counts[self.i:self.j]
+        valid_values = self.counts[self.i : self.j]
         if self._x_central_line_uses == AVERAGE:
             value = self._mean(valid_values)
         elif self._x_central_line_uses == MEDIAN:
@@ -294,13 +298,15 @@ class Base:
 
         result: List[Union[None, Decimal]] = [None] * (n - 1)
         nd = Decimal(n)
-        for i in range(n-1, len(self.counts)):
-            ma = sum(self.counts[i-n+1:i+1]) / nd
+        for i in range(n - 1, len(self.counts)):
+            ma = sum(self.counts[i - n + 1 : i + 1]) / nd
             result.append(ma)
 
         return result
 
-    def x_exponential_moving_average(self, smoothing_factor: float = 0.9) -> List[Decimal]:
+    def x_exponential_moving_average(
+        self, smoothing_factor: float = 0.9
+    ) -> List[Decimal]:
         """
         Returns the Exponential Moving Average for the X data
         :param smoothing_factor The smoothing factor to apply to the function.
@@ -313,14 +319,14 @@ class Base:
         smoothing_pct = Decimal('1') - Decimal(str(smoothing_factor))
         for i in range(1, len(result)):
             curr = result[i]
-            prev = result[i-1]
+            prev = result[i - 1]
             result[i] = round(prev + smoothing_pct * (curr - prev), ROUNDING)
         return result
 
     def mr_central_line(self) -> Sequence[Decimal]:
         mr = self.moving_ranges()
         assert mr[0] is None
-        valid_values = cast(TYPE_COUNTS, mr[self.i + 1:self.j])
+        valid_values = cast(TYPE_COUNTS, mr[self.i + 1 : self.j])
 
         if self._moving_range_uses == AVERAGE:
             value = self._mean(valid_values)
@@ -390,9 +396,9 @@ class Base:
         return any(x > self.limit_floor for x in lnpl)
 
     def rule_1_x_indices_beyond_limits(
-            self,
-            upper_limit: Optional[Decimal] = None,
-            lower_limit: Optional[Decimal] = None,
+        self,
+        upper_limit: Optional[Decimal] = None,
+        lower_limit: Optional[Decimal] = None,
     ) -> List[bool]:
         """
         Points Outside the Limits
@@ -431,7 +437,9 @@ class Base:
         :return: list[bool] A list of boolean values of length(self.moving_ranges())
             True at index i means that self.moving_ranges()[i] is above the Upper Range Limit
         """
-        return self._points_beyond_limits(self.moving_ranges(), self.upper_range_limit())
+        return self._points_beyond_limits(
+            self.moving_ranges(), self.upper_range_limit()
+        )
 
     def rule_2_runs_about_central_line(self) -> List[bool]:
         """
@@ -495,7 +503,7 @@ class Base:
                 near_limits[i] = 1
 
             if i >= 3:
-                successive_values = near_limits[i - 3:i + 1]
+                successive_values = near_limits[i - 3 : i + 1]
                 if abs(sum(successive_values)) >= 3:
                     for j in range(i - 3, i + 1):
                         result[j] = True
@@ -504,9 +512,9 @@ class Base:
 
     @staticmethod
     def _points_beyond_limits(
-            data: TYPE_MOVING_RANGES,
-            upper_limits: Sequence[Decimal],
-            lower_limits: Optional[Sequence[Decimal]] = None
+        data: TYPE_MOVING_RANGES,
+        upper_limits: Sequence[Decimal],
+        lower_limits: Optional[Sequence[Decimal]] = None,
     ) -> List[bool]:
         result = [False] * len(data)
 
